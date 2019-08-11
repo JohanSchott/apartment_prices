@@ -4,10 +4,10 @@ A package for predicting apartment prices in Stockholm using supervised machine 
    
 """
 
-from . import load_nn
 from . import location
 from . import models 
 from . import nn
 from . import time_stuff   
+from . import disp
 
 

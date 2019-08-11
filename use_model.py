@@ -17,32 +17,21 @@ from datetime import datetime
 # Local libraries
 from apartment_prices import time_stuff
 from apartment_prices import location
-from apartment_prices.load_nn import load_nn_model_from_file
+from apartment_prices.nn import load_nn_model_from_file
 from apartment_prices import plot
-
-
-def print_apartment_into(features, apartment, model=None):
-    for feature, value in zip(features, apartment):
-        if feature == 'soldDate':
-            dt_object = datetime.fromtimestamp(value)
-            print(feature + ': {:.2f}'.format(value) + ' (corresponds to date: ' + str(dt_object.date()) + ')')
-        else:
-            print(feature + ': {:.2f}'.format(value))
-    if model != None:
-        print('Predicted apartment price: {:.1f} Msek \n'.format(model.predict(apartment)/10**6))
-    else:
-        print('')
+from apartment_prices import disp
 
 
 def main():
     # 1) Load machine learning (ML) model
-
-    #filename_load = 'models/sthlm_layers9_20_10_10_10_5_5_5_5_5_5_5_1_shuffle0.h5'
-    filename_load = 'models/sthlm_layers9_40_30_20_10_10_1_shuffle0.h5'
-
-    model = load_nn_model_from_file(filename_load)
+    #filename_nn = 'models/sthlm_layers9_20_10_10_10_5_5_5_5_5_5_5_1_sigmoid.h5'
+    filename_nn = 'models/sthlm_layers9_40_30_20_10_10_1_sigmoid.h5'
+    #filename_nn = 'models/sthlm_layers9_3_1_sigmoid.h5'
+    model = load_nn_model_from_file(filename_nn)
     # List of features expected as input by the model
-    features = model.features
+    features = model.attributes['features']
+    print('Input features:')
+    print(features)
 
     # 2) Provide basic apartment information
     apartments = {}
@@ -97,7 +86,7 @@ def main():
     # Print apartment info and predicted prices
     for label, apartment in apartments.items():
         print(label)
-        print_apartment_into(features, apartment, model)
+        disp.apartment_into(features, apartment, model)
 
     # Time evolve apartments
     i = np.where(features == 'soldDate')[0][0]
@@ -129,7 +118,7 @@ def main():
     plt.ylabel('price (sek)')
     plt.xticks([time_stuff.get_time_stamp(year, 1, 1) for year in years], years)
     plt.grid()
-    plt.legend()
+    plt.legend(loc=0)
     plt.savefig('figures/time_evolve_new.pdf')
     plt.savefig('figures/time_evolve_new.png')
     plt.show()
@@ -146,8 +135,10 @@ def main():
     apartments['median apartment, current time'] = apartments['median apartment'].copy()
     apartments['median apartment, current time'][i] = datetime.now().timestamp()
     # Calculate the price for a latitude and longitude mesh
-    latitude_lim = [59.28, 59.42]
-    longitude_lim = [17.93, 18.19]
+    #latitude_lim = [59.28, 59.42]
+    #longitude_lim = [17.93, 18.19]
+    latitude_lim = [59.25, 59.45]
+    longitude_lim = [17.88, 18.19]
     latitudes = np.linspace(latitude_lim[0], latitude_lim[1], 310)
     longitudes = np.linspace(longitude_lim[0], longitude_lim[1], 300)
     longitude_grid, latitude_grid = np.meshgrid(longitudes, latitudes)
@@ -163,11 +154,10 @@ def main():
             tmp[k] = location.distance_2_sthlm_center(lat, long)
             price_grid[i,j] = model.predict(tmp)
     price_grid[price_grid < 0] = np.nan
-
     # Plot map and apartment prices
-    fig = plt.figure(figsize=(10, 10))
+    fig = plt.figure(figsize=(8,8))
     # map rendering quality. 6 is very bad, 10 is ok, 12 is good, 13 is very good, 14 excellent
-    map_quality = 13
+    map_quality = 12
     plot.plot_map(longitude_lim, latitude_lim, map_quality)
     # Plot the price
     i = np.where(features == 'livingArea')[0][0]
@@ -177,13 +167,36 @@ def main():
     # Plot landmarks of Stockholm
     plot.plot_sthlm_landmarks()
     # Plot design
-    plt.legend()
+    plt.legend(loc=0)
     plt.xlabel('longitude')
     plt.ylabel('latitude')
     plt.savefig('figures/sthlm_new.pdf')
     plt.savefig('figures/sthlm_new.png')
     plt.show()
 
+
+    # Plot figure with distance to Stockholm center
+    d2c_grid = np.zeros_like(longitude_grid, dtype=np.float)
+    for i, lat in enumerate(latitudes):
+        for j, long in enumerate(longitudes):
+            d2c_grid[i,j] = location.distance_2_sthlm_center(lat, long)
+    fig = plt.figure(figsize=(8,8))
+    # map rendering quality. 6 is very bad, 10 is ok, 12 is good, 13 is very good, 14 excellent
+    map_quality = 12
+    plot.plot_map(longitude_lim, latitude_lim, map_quality)
+    # Plot distance
+    plot.plot_contours(fig, longitude_grid, latitude_grid,
+                       d2c_grid,
+                       colorbarlabel=r'distance to center  (km)')
+    # Plot landmarks of Stockholm
+    plot.plot_sthlm_landmarks()
+    # Plot design
+    plt.legend(loc=0)
+    plt.xlabel('longitude')
+    plt.ylabel('latitude')
+    plt.savefig('figures/sthlm_d2c_new.pdf')
+    plt.savefig('figures/sthlm_d2c_new.png')
+    plt.show()
 
 if __name__ == "__main__":
     main()
