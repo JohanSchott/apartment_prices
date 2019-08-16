@@ -168,7 +168,7 @@ def plot_contours(figure_handle, x, y, z, colorbarlabel=None):
     CS = plt.contourf(x, y, z,
                       levels=50,
                       cmap=plt.cm.jet, # viridis
-                      alpha=0.3,   # vmin=np.max([0, np.min(z)])
+                      alpha=0.5,   # vmin=np.max([0, np.min(z)])
                       transform=ccrs.PlateCarree())
     CS2 = plt.contour(CS, levels=CS.levels[::5], # np.arange(60, 105, 5)
                       cmap=plt.cm.jet, # viridis
@@ -219,7 +219,7 @@ def plot_sthlm_landmarks():
     # Ericsson's headquarter
     lat, long = 59.404853, 17.955040
     plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
-    plt.text(long, lat - 0.003, 'Ericsson', transform=ccrs.Geodetic())
+    plt.text(long, lat + 0.001, 'Ericsson', transform=ccrs.Geodetic())
     # Mall of Scandinavia
     lat, long = 59.370296, 18.004620
     plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
@@ -258,3 +258,56 @@ def plot_sthlm_landmarks():
     lat, long = 59.298186, 17.996986
     plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
     plt.text(long, lat + 0.001, 'Telefonplan', transform=ccrs.Geodetic())
+    # Huddinge station
+    lat, long =  59.236353, 17.978874 
+    plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
+    plt.text(long, lat + 0.001, 'Huddinge', transform=ccrs.Geodetic())
+    # Drottningholm
+    lat, long =  59.321684, 17.886840 
+    plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
+    plt.text(long, lat + 0.001, 'Drottningholm', transform=ccrs.Geodetic())
+    # Täby
+    lat, long = 59.444222, 18.074514 
+    plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
+    plt.text(long, lat + 0.001, 'Täby', transform=ccrs.Geodetic())
+    # Sollentuna
+    lat, long = 59.428485, 17.948356
+    plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
+    plt.text(long, lat + 0.001, 'Sollentuna', transform=ccrs.Geodetic())
+    # Spånga
+    lat, long =  59.383285, 17.898908 
+    plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
+    plt.text(long, lat + 0.001, 'Spånga', transform=ccrs.Geodetic())
+    # Bromma airport
+    lat, long =  59.354626, 17.942596 
+    plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
+    plt.text(long, lat - 0.004, 'Airport', transform=ccrs.Geodetic())
+    # Millesgården
+    lat, long = 59.358678, 18.121680
+    plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
+    plt.text(long - 0.02, lat + 0.001, 'Millesgården', transform=ccrs.Geodetic())
+    # Naturhistoriska
+    lat, long = 59.368972, 18.053875
+    plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
+    plt.text(long - 0.02, lat + 0.001, 'Naturhistoriska', transform=ccrs.Geodetic())
+    # Hökarängen
+    lat, long = 59.256956, 18.083102
+    plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
+    plt.text(long, lat + 0.001, 'Hökarängen', transform=ccrs.Geodetic())
+    # Bagarmossen
+    lat, long = 59.276264, 18.131451
+    plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
+    plt.text(long - 0.02, lat + 0.002, 'Bagarmossen', transform=ccrs.Geodetic())
+    # Skärholmen
+    lat, long = 59.277121, 17.907009
+    plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
+    plt.text(long, lat + 0.001, 'Skärholmen', transform=ccrs.Geodetic())
+    # Mörby
+    lat, long = 59.398426, 18.036220
+    plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
+    plt.text(long, lat + 0.001, 'Mörby', transform=ccrs.Geodetic())
+    # Akalla
+    lat, long = 59.415509, 17.913094
+    plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
+    plt.text(long + 0.001, lat + 0.001, 'Akalla', transform=ccrs.Geodetic())
+

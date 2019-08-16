@@ -24,9 +24,10 @@ from apartment_prices import disp
 
 def main():
     # 1) Load machine learning (ML) model
-    #filename_nn = 'models/sthlm_layers9_20_10_10_10_5_5_5_5_5_5_5_1_sigmoid.h5'
-    filename_nn = 'models/sthlm_layers9_40_30_20_10_10_1_sigmoid.h5'
     #filename_nn = 'models/sthlm_layers9_3_1_sigmoid.h5'
+    #filename_nn = 'models/sthlm_layers9_20_10_10_10_5_5_5_5_5_5_5_1_sigmoid.h5'
+    #filename_nn = 'models/sthlm_layers9_40_30_20_10_10_1_sigmoid.h5'
+    filename_nn = 'models/sthlm_layers9_30_30_60_30_20_10_10_10_10_10_1_sigmoid.h5'
     model = load_nn_model_from_file(filename_nn)
     # List of features expected as input by the model
     features = model.attributes['features']
@@ -137,7 +138,7 @@ def main():
     # Calculate the price for a latitude and longitude mesh
     #latitude_lim = [59.28, 59.42]
     #longitude_lim = [17.93, 18.19]
-    latitude_lim = [59.25, 59.45]
+    latitude_lim = [59.233, 59.45]
     longitude_lim = [17.88, 18.19]
     latitudes = np.linspace(latitude_lim[0], latitude_lim[1], 310)
     longitudes = np.linspace(longitude_lim[0], longitude_lim[1], 300)

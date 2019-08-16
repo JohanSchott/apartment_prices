@@ -13,6 +13,13 @@ This module contains a neural network class and some useful neural network funct
 import numpy as np
 import h5py
 from scipy.optimize import minimize
+import scipy.special
+
+
+# Machine precision to use
+dtype = np.float32
+#dtype = np.float64
+
 
 class Model:
 
@@ -26,8 +33,12 @@ class Model:
 
         """
         # Keep all data and attributes
-        self.data = data
-        self.attributes = attributes
+        self.data = data.copy()
+        self.attributes = attributes.copy()
+        # Convert all model float arrays to the desired precision.
+        for key, value in self.data.items():
+            if value.dtype == np.float64 or value.dtype == np.float32:
+                self.data[key] = np.array(value, dtype=dtype)
         # Sanity checks
         assert 'activation_type' in data
         assert 'layers' in data
@@ -53,7 +64,7 @@ class Model:
         h5f.close()
 
 
-    def train(self, x_train, y_train, x_cv, y_cv, gammas=[0.0001], epochs=1,
+    def train(self, x_train, y_train, x_cv, y_cv, gammas=[0.00001], epochs=1,
               batchsize=30000, method='BFGS', gtol=1*1e-05, maxiter=10,
               renormalize=False):
         """
@@ -84,7 +95,14 @@ class Model:
             If to renormalize input and output,
             or if use existing normalization values.
         """
-        # Convert to numpy array
+        # Cast input parameters to desired precision
+        x_train = np.array(x_train, dtype=dtype)
+        y_train = np.array(y_train, dtype=dtype)
+        x_cv = np.array(x_cv, dtype=dtype)
+        y_cv = np.array(y_cv, dtype=dtype)
+        gammas = np.array(gammas, dtype=dtype)
+
+        # Cast to numpy array
         gammas = np.array(gammas)
 
         # If predict_log_value is True, the cost function will be of the form:
@@ -107,7 +125,7 @@ class Model:
         # Set default values
         if not 'p' in self.data:
             # Randomly initialize parameters
-            self.data['p'] = np.random.randn(r)
+            self.data['p'] = np.random.randn(r, dtype=dtype)
         if not 'mu_x' in self.data or renormalize:
             self.data['mu_x'] = mu_x
         if not 'std_x' in self.data or renormalize:
@@ -159,7 +177,7 @@ class Model:
         return history
 
 
-    def get_cost(self, x, y):
+    def get_cost(self, x, y, gamma=0., output='value'):
         """
         Return cost function value.
         """
@@ -170,7 +188,10 @@ class Model:
                 'mu_y' in self.data and
                 'std_y' in self.data):
             sys.exit('Not all parameters are initioalized...')
-        x = np.array(x)
+        # Cast input parameters to desired precision
+        x = np.array(x, dtype=dtype)
+        y = np.array(y, dtype=dtype)
+        gamma = np.array(gamma, dtype=dtype)
         if x.ndim == 1:
             x = np.atleast_2d(x).T
         elif x.ndim > 2:
@@ -184,7 +205,7 @@ class Model:
         y_norm = norm_and_scale(y, self.data['mu_y'], self.data['std_y'])
 
         return cost_NN(self.data['p'], x_norm, y_norm, self.data['layers'],
-                       self.data['activation_type'], output='value')
+                       self.data['activation_type'], gamma=gamma, output=output)
 
 
     def predict(self, x):
@@ -205,8 +226,8 @@ class Model:
                 'mu_y' in self.data and
                 'std_y' in self.data):
             sys.exit('Not all parameters are initioalized...')
-
-        x = np.array(x)
+        # Cast input parameters to desired precision
+        x = np.array(x, dtype=dtype)
         if x.ndim == 1:
             x = np.atleast_2d(x).T
         elif x.ndim > 2:
@@ -284,7 +305,7 @@ def hypothesis(x, p, layers, activation_type='sigmoid',
     # Model parameters, unrolled
     w, b = unroll(p, layers)
     # Model predictions
-    h = np.zeros(m, dtype=np.float)
+    h = np.zeros(m, dtype=dtype)
 
     # Parallelized version, no loop over examples
     z = x
@@ -305,14 +326,15 @@ def sigmoid(z):
     """
     Return the sigmoid function.
     """
-    return 1/(1 + np.exp(-z))
+    return scipy.special.expit(z)
 
 
 def dsigmoid(z):
     """
     Return the derivative of the sigmoid function.
     """
-    return sigmoid(z)*(1-sigmoid(z))
+    sigmoid_value = sigmoid(z)
+    return sigmoid_value*(1-sigmoid_value)
 
 
 def relu(z):
@@ -348,7 +370,7 @@ def inroll(w, b):
     r = 0
     for i in range(len(w)):
         r += w[i].size + b[i].size
-    p = np.zeros(r, dtype=np.float)
+    p = np.zeros(r, dtype=dtype)
     # Fill p
     j, k = 0, 0
     for i in range(len(w)):
@@ -400,6 +422,7 @@ def get_norm_and_scale(x):
         sys.exit("Not implemented yet...")
     #return x_ns, mu, std
     return mu, std
+
 
 def hypothesis_linear_regression(p, x):
     """
@@ -807,7 +830,6 @@ def cost_NN(p, x, y, layers, activation_type='sigmoid',
     w, b = unroll(p, layers)
 
     # Forward propagation
-    h = np.zeros(m, dtype=np.float)
     # Parallelized version, no loop over examples
     z = []
     a = []
