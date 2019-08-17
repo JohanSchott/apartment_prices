@@ -123,6 +123,38 @@ def main():
     plt.savefig('figures/time_evolve_new.pdf')
     plt.savefig('figures/time_evolve_new.png')
     plt.show()
+    
+    # Price/m^2 as function of m^2 
+    feature = 'livingArea'
+    area_index = np.where(features == feature)[0][0]
+    time_index = np.where(features == 'soldDate')[0][0]
+    areas = np.linspace(20, 150, 300)
+    price_density = np.zeros((len(areas), len(apartments)))
+    time_stamp = datetime.now().timestamp()
+    for j, apartment in enumerate(apartments.values()):
+        # Change to current time
+        tmp = apartment.copy()
+        tmp[time_index] = time_stamp
+        for k, area in enumerate(areas):
+            # Change area
+            tmp[area_index] = area
+            price_density[k, j] = model.predict(tmp)/area
+    # Plot price density
+    plt.figure()
+    for j, (label, apartment) in enumerate(apartments.items()):
+        plt.plot(areas, price_density[:,j]/1000, '-', label=label)
+        # Plot price density for actual area size, at current time
+        tmp = apartment.copy()
+        tmp[time_index] = time_stamp
+        plt.plot(tmp[area_index], model.predict(tmp)/(tmp[area_index]*1000), 'o', color='k')
+    plt.xlabel(feature + '  ($m^2$)')
+    plt.ylabel('price/livingArea (ksek/$m^2$)')
+    plt.grid()
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig('figures/price_density_new.pdf')
+    plt.savefig('figures/price_density_new.png')
+    plt.show()
 
     # 3.2) Create contour color-map of Stockholm
     # Model the apartment price on a grid of geographical positions.
