@@ -304,4 +304,9 @@ def plot_sthlm_landmarks():
     lat, long = 59.415509, 17.913094
     plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
     plt.text(long + 0.001, lat + 0.001, 'Akalla', transform=ccrs.Geodetic())
+    # Jacobsberg
+    lat, long = 59.423529, 17.833041
+    plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
+    plt.text(long + 0.001, lat + 0.001, 'Jacobsberg', transform=ccrs.Geodetic())
+
 

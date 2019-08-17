@@ -168,10 +168,8 @@ def main():
     apartments['median apartment, current time'] = apartments['median apartment'].copy()
     apartments['median apartment, current time'][i] = datetime.now().timestamp()
     # Calculate the price for a latitude and longitude mesh
-    #latitude_lim = [59.28, 59.42]
-    #longitude_lim = [17.93, 18.19]
     latitude_lim = [59.233, 59.45]
-    longitude_lim = [17.88, 18.19]
+    longitude_lim = [17.82, 18.19]
     latitudes = np.linspace(latitude_lim[0], latitude_lim[1], 310)
     longitudes = np.linspace(longitude_lim[0], longitude_lim[1], 300)
     longitude_grid, latitude_grid = np.meshgrid(longitudes, latitudes)
