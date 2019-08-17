@@ -108,18 +108,18 @@ def main():
     # Plot prices
     plt.figure()
     for j, (label, apartment) in enumerate(apartments.items()):
-        plt.plot(times, prices[:,j], '-', label=label)
-        #plt.plot(times, prices[:,j]*np.max(prices[:,0])/np.max(prices[:,j]), '-', label=label)
+        plt.plot(times, prices[:,j]/10**6, '-', label=label)
         # Plot current price
         tmp = apartment.copy()
         time_stamp = datetime.now().timestamp()
         tmp[i] = time_stamp
-        plt.plot(time_stamp, model.predict(tmp), 'o', color='k')
+        plt.plot(time_stamp, model.predict(tmp)/10**6, 'o', color='k')
     plt.xlabel('time')
-    plt.ylabel('price (sek)')
+    plt.ylabel('price (Msek)')
     plt.xticks([time_stuff.get_time_stamp(year, 1, 1) for year in years], years)
     plt.grid()
-    plt.legend(loc=0)
+    plt.legend()
+    plt.tight_layout()
     plt.savefig('figures/time_evolve_new.pdf')
     plt.savefig('figures/time_evolve_new.png')
     plt.show()
