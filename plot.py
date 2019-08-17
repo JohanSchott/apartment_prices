@@ -142,7 +142,7 @@ def plot_apartments_in_color(x, features, color, colorbarlabel):
     # Relative deviation in procentage
     sc = plt.scatter(x[j,:], x[i,:], s=0.01, c=color,
                      vmin=-2*np.std(color), vmax=2*np.std(color),
-                     cmap=plt.cm.seismic, label='apartments',
+                     cmap=plt.cm.seismic, label='data',
                      transform=ccrs.Geodetic())
     cbar = plt.colorbar(sc)
     if colorbarlabel != None:
