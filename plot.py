@@ -14,6 +14,7 @@ import cartopy.io.img_tiles as cimgt
 # Local libraries
 from . import location
 from . import time_stuff
+from . import nn
 
 def visualize_data(x_raw, y_raw, features, y_label, normal_apartment_indices):
     # Inspect data
@@ -65,80 +66,73 @@ def visualize_data(x_raw, y_raw, features, y_label, normal_apartment_indices):
     print()
 
 
-def plot_errors(x_raw, y_raw, y_model, normal_apartment_indices):
+def plot_errors(x, y, y_model, normal_apartment_indices):
     """
     Plot several figures of the errors between model prediction and data.
     """
-    # Relative deviation in procentage
-    rel_deviation = (y_model - y_raw)/np.abs(y_raw)
-    print('Mean relative error on the full data set (%): ', 100*np.mean(np.abs(rel_deviation)))
-    print('Median relative error on the full data set (%) : ', 100*np.median(np.abs(rel_deviation)))
-    print('Standard deviation of relative deviation (%): ', 100*np.std(rel_deviation))
-    print('Mean relative devation (%): ', 100*np.mean(rel_deviation))
-    print('Min and max relative deviation (%): ', 100*np.min(rel_deviation), 100*np.max(rel_deviation))
+    # Relative difference
+    rel_diff = (y_model - y)/np.abs(y)
+    m = len(y)
+    indices_all = nn.shuffle_and_divide_indices(m)
+    labels = ['train', 'cv', 'test']
+    print('\n')
+    for label, indices in zip(labels, indices_all):
+        print('------', label, 'set ------')
 
-    print('\n Analyze the worst apartment')
-    i = np.argmax(np.abs(rel_deviation))
-    print('csv index:', normal_apartment_indices[i])
-    print('x_raw index:', i)
-    print('features:', x_raw[:,i])
-    print('sold price: ', y_raw[i], ', model price estimation:', y_model[i])
-    print('rel deviation:', rel_deviation[i])
+        print('Analyze the worst apartment')
+        i = np.argmax(np.abs(rel_diff[indices]))
+        print('csv index:', normal_apartment_indices[indices[i]])
+        print('Features:', x[:, indices[i]])
+        print('Sold price: ', y[indices[i]], ', model price estimation:', y_model[indices[i]])
+        print('Relative difference:', rel_diff[indices[i]], '\n')
+    
+        print('Identify the worst apartments')
+        mask = np.abs(rel_diff[indices]) > 1.5
+        print('Relative differences:', rel_diff[indices[mask]])
+        print('csv indices:', normal_apartment_indices[indices[mask]], '\n')
+ 
+        print('Mean relative error (%): ', 100*np.mean(np.abs(rel_diff[indices])))
+        print('Median relative error (%) : ', 100*np.median(np.abs(rel_diff[indices])))
+        print('Standard deviation of relative difference (%): ', 100*np.std(rel_diff[indices]))
+        print('Mean relative difference (%): ', 100*np.mean(rel_diff[indices]))
+        print('Min and max relative difference (%): ', 100*np.min(rel_diff[indices]), 100*np.max(rel_diff[indices]))
+        print('\n')
 
-    print('\n Analyze the worst apartments')
-    mask = np.abs(rel_deviation) > 1.5
-    print(rel_deviation[mask])
-    print('csv indices:', normal_apartment_indices[mask])
-    print('x_raw indices:', np.where(mask))
 
+    # Distribution of prices
+    xlim = (0,18*10**6)
+    for label, indices in zip(labels, indices_all):
+        plt.figure()
+        plt.hist(y[indices], bins=50, range=xlim, label='exact')
+        plt.hist(y_model[indices], bins=50, range=xlim, label='model', alpha=0.6)
+        plt.xlabel('apartment price (sek)')
+        plt.ylabel('apartment distribution')
+        plt.legend(loc=0)
+        plt.title(label)
+        plt.show()
+
+    # Distribution of logarithm of prices
+    range_min = np.min([np.min(np.log(y)),np.min(np.log(y_model))])
+    range_max = np.max([np.max(np.log(y)),np.max(np.log(y_model))])
+    for label, indices in zip(labels, indices_all):
+        plt.figure()
+        plt.hist(np.log(y[indices]), bins=50, range=(range_min, range_max), label='exact')
+        plt.hist(np.log(y_model[indices]), bins=50, range=(range_min, range_max), label='model', alpha=0.6)
+        plt.xlabel('log(apartment price) (sek)')
+        plt.ylabel('apartment distribution')
+        plt.legend(loc=0)
+        plt.title(label)
+        plt.show()
+
+    # Distribution of relative difference
     plt.figure()
-    plt.plot(y_raw, 'o',label='exact')
-    plt.plot(y_model, 'o', label='model')
-    plt.xlabel('apartment index')
-    plt.ylabel('apartment price (sek)')
-    plt.legend(loc=0)
-    plt.show()
-
-    plt.figure()
-    plt.hist(y_raw, bins=50, range=(0,18*10**6), label='exact')
-    plt.hist(y_model, bins=50, range=(0,18*10**6), label='model', alpha=0.6)
-    plt.xlabel('apartment price (sek)')
-    plt.ylabel('apartment distribution')
-    plt.legend(loc=0)
-    plt.show()
-
-    plt.figure()
-    range_min = np.min([np.min(np.log(y_raw)),np.min(np.log(y_model))])
-    range_max = np.max([np.max(np.log(y_raw)),np.max(np.log(y_model))])
-    plt.hist(np.log(y_raw), bins=50, range=(range_min, range_max), label='exact')
-    plt.hist(np.log(y_model), bins=50, range=(range_min, range_max), label='model', alpha=0.6)
-    plt.xlabel('log(apartment price) (sek)')
-    plt.ylabel('apartment distribution')
-    plt.legend(loc=0)
-    plt.show()
-
-    plt.figure()
-    plt.plot(100*rel_deviation, 'o')
-    plt.xlabel('apartment index')
-    plt.ylabel('Relative deviation (%)')
-    plt.show()
-
-    plt.figure()
-    plt.hist(100*rel_deviation, bins=50, range=(-40, 40))
+    alphas = [1, 0.7, 0.4]
+    for label, indices, alpha in zip(labels, indices_all, alphas):
+        plt.hist(100*rel_diff[indices], bins=50, range=(-40, 40), 
+                 density=True, label=label, alpha=alpha)
     plt.xlabel('Relative deviation (%)')
     plt.ylabel('apartment distribution')
-    plt.show()
-
-    plt.figure()
-    plt.plot(100*np.abs(rel_deviation), 'o')
-    plt.xlabel('apartment index')
-    plt.ylabel('Relative error (%)')
-    plt.show()
-
-    plt.figure()
-    plt.hist(100*np.abs(rel_deviation), bins=50, range=(0, 40))
-    plt.xlabel('Relative error (%)')
-    plt.ylabel('apartment distribution')
+    plt.legend(loc=0)
     plt.show()
 
 

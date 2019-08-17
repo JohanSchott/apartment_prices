@@ -383,20 +383,25 @@ def inroll(w, b):
     return p
 
 
-def shuffle_and_divide_up_data(x, y, p_train=0.6, p_cv=0.2):
-    m = len(y)
+def shuffle_and_divide_indices(m, p_train=0.6, p_cv=0.2):
     m_train = int(m*p_train)
     m_cv = int(m*p_cv)
     # Same division of data.
     # E.g. want to avoid testing on previous training data.
     p = np.random.RandomState(seed=42).permutation(m)
-    #p = np.random.permutation(m)
-    x_train = x[:, p[:m_train]]
-    y_train = y[p[:m_train]]
-    x_cv = x[:, p[m_train:m_train+m_cv]]
-    y_cv = y[p[m_train:m_train+m_cv]]
-    x_test = x[:, p[m_train+m_cv:]]
-    y_test = y[p[m_train+m_cv:]]
+    indices = [p[:m_train], p[m_train:m_train+m_cv], p[m_train+m_cv:]]
+    return indices
+
+
+def shuffle_and_divide_up_data(x, y, p_train=0.6, p_cv=0.2):
+    m = len(y)
+    indices = shuffle_and_divide_indices(m, p_train, p_cv)
+    x_train = x[:, indices[0]]
+    y_train = y[indices[0]]
+    x_cv = x[:, indices[1]]
+    y_cv = y[indices[1]]
+    x_test = x[:, indices[2]]
+    y_test = y[indices[2]]
     return x_train, y_train, x_cv, y_cv, x_test, y_test
 
 
