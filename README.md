@@ -29,7 +29,7 @@ Predict apartment prices in Stockholm using machine learning!
 
 ### How to get started
 - View the figures in the `figures` folder.
-- Run Python script `use_model.py`.
-  This will (hopefully) load a neural network model, which is used to generate a map of Stockholm with the apartment price color-coded for the median apartment of Stockholm.
+- Use script `use_model_tf.sh`.
+  This will (hopefully) load a neural network model, which is used to generate a map of Stockholm with the apartment price color-coded.
 
 
