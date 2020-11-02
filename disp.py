@@ -9,7 +9,7 @@ def apartment_into(features, apartment, model=None):
         else:
             print(feature + ': {:.2f}'.format(value))
     if model != None:
-        print('Predicted apartment price: {:.1f} Msek \n'.format(model.predict(apartment)/10**6))
+        print('Predicted apartment price: {:.1f} Msek \n'.format(model.predict(apartment) / 10**6))
     else:
         print('')
 

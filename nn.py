@@ -125,7 +125,7 @@ class Model:
         # Set default values
         if not 'p' in self.data:
             # Randomly initialize parameters
-            self.data['p'] = np.random.randn(r, dtype=dtype)
+            self.data['p'] = np.random.randn(r).astype(dtype)
         if not 'mu_x' in self.data or renormalize:
             self.data['mu_x'] = mu_x
         if not 'std_x' in self.data or renormalize:
@@ -146,8 +146,8 @@ class Model:
             p, hist = get_minimization_solution(self.data['p'], x_train, y_train,
                                                 self.data['layers'],
                                                 self.data['activation_type'],
-                                                gamma, epochs, batchsize,
-                                                method, gtol, maxiter)
+                                                gamma=gamma, epochs=epochs, batchsize=batchsize,
+                                                method=method, gtol=gtol, maxiter=maxiter)
             cost_cv = cost_NN(p, x_cv, y_cv, self.data['layers'],
                               self.data['activation_type'],
                               output='value')
@@ -187,7 +187,7 @@ class Model:
                 'std_x' in self.data and
                 'mu_y' in self.data and
                 'std_y' in self.data):
-            sys.exit('Not all parameters are initioalized...')
+            raise Exception('Not all parameters are initioalized...')
         # Cast input parameters to desired precision
         x = np.array(x, dtype=dtype)
         y = np.array(y, dtype=dtype)
@@ -195,7 +195,7 @@ class Model:
         if x.ndim == 1:
             x = np.atleast_2d(x).T
         elif x.ndim > 2:
-            sys.exit('Unexpected input dimension of apartment features')
+            raise Exception('Unexpected input dimension of apartment features')
         # Log value
         if self.data['predict_log_value']:
             # Fit to logarithm of the output (instead of fitting to the output).
@@ -225,13 +225,13 @@ class Model:
                 'std_x' in self.data and
                 'mu_y' in self.data and
                 'std_y' in self.data):
-            sys.exit('Not all parameters are initioalized...')
+            raise Exception('Not all parameters are initioalized...')
         # Cast input parameters to desired precision
         x = np.array(x, dtype=dtype)
         if x.ndim == 1:
             x = np.atleast_2d(x).T
         elif x.ndim > 2:
-            sys.exit('Unexpected input dimension of apartment features')
+            raise Exception('Unexpected input dimension of apartment features')
         # Normalize and scale input
         x_norm = norm_and_scale(x, self.data['mu_x'], self.data['std_x'])
         # Calculate output from neural network
@@ -266,22 +266,23 @@ def load_nn_model_from_file(filename):
     return model
 
 
-def norm_and_scale(x, mu, std):
+def norm_and_scale(x, mu, std, axis=1):
     """
     Return normalized data.
     """
     if x.ndim == 1:
         # Normalize and scale input
-        x_ns = (x - mu)/std
+        x_ns = (x - mu) / std
     elif x.ndim == 2:
-        # Number of features
-        n = np.shape(x)[0]
         # Normalize and scale input
-        x_ns = np.zeros_like(x)
-        for i in range(n):
-            x_ns[i,:] = (x[i,:] - mu[i])/std[i]
+        x_ns = (x - mu) / std
+        # Number of features
+        #n = np.shape(x)[0]
+        #x_ns = np.zeros_like(x)
+        #for i in range(n):
+        #    x_ns[i,:] = (x[i,:] - mu[i])/std[i]
     else:
-        sys.exit("Not implemented yet...")
+        raise Exception("Not implemented yet...")
     return x_ns
 
 
@@ -298,7 +299,7 @@ def hypothesis(x, p, layers, activation_type='sigmoid',
     elif activation_type == 'ReLu':
         g = lambda v: relu(v)
     else:
-        sys.exit("This activation function has not been implemented.")
+        raise Exception("This activation function has not been implemented.")
 
     # Number of features and number of data examples
     n, m = np.shape(x)
@@ -405,26 +406,24 @@ def shuffle_and_divide_up_data(x, y, p_train=0.6, p_cv=0.2):
     return x_train, y_train, x_cv, y_cv, x_test, y_test
 
 
-def get_norm_and_scale(x):
+def get_norm_and_scale(x, axis=1):
     """
     Return norm, scaling and normalized data.
     """
     if x.ndim == 1:
         # Average and standard deviation
         mu = np.mean(x)
-        std = np.sqrt(np.mean((x - mu)**2))
+        std = np.std(x)
         # Normalize and scale input
-        x_ns = (x - mu)/std
+        x_ns = (x - mu) / std
     elif x.ndim == 2:
-        # Number of features
-        n = np.shape(x)[0]
         # Average and standard deviation
-        mu = np.mean(x, axis=1, keepdims=True)
-        std = np.std(x, axis=1, keepdims=True)
+        mu = np.mean(x, axis=axis, keepdims=True)
+        std = np.std(x, axis=axis, keepdims=True)
         # Normalize and scale input
-        x_ns = (x - mu)/std
+        x_ns = (x - mu) / std
     else:
-        sys.exit("Not implemented yet...")
+        raise Exception("Not implemented yet...")
     #return x_ns, mu, std
     return mu, std
 
@@ -469,7 +468,7 @@ def cost_linear_regression(p, x, y, gamma=0, output='value and gradient'):
     elif output == 'value and gradient':
         return c, dp
     else:
-        sys.exit('Output option not possible.')
+        raise Exception('Output option not possible.')
 
 
 def gradient_descent(fun, jac, p_initial, alpha=0.05, maxiter=10**4,
@@ -584,7 +583,7 @@ def train_NN(x_train, y_train, x_cv, y_cv, layers, gammas,
     activation_type : str
         'sigmoid' or 'ReLu'.
     logistic_output : boolean
-        If logistic regression of regression.
+        If logistic regression or regression.
     epochs : int
         Number of epochs
     batchsize : int
@@ -630,7 +629,7 @@ def train_NN(x_train, y_train, x_cv, y_cv, layers, gammas,
 
 
 def get_minimization_solution(p0, x, y, layers, activation_type,
-                              gamma, epochs=100, batchsize=None,
+                              logistic_output=False, gamma=0, epochs=100, batchsize=None,
                               method='BFGS', gtol=1e-05, maxiter=None):
     """
     Return solution to minimization.
@@ -662,10 +661,10 @@ def get_minimization_solution(p0, x, y, layers, activation_type,
                 indices = permutation[batch*batchsize:(batch+1)*batchsize]
             # NN cost function and its gradient.
             fun = lambda param: cost_NN(param, x[:,indices], y[indices], layers,
-                                    activation_type, gamma=gamma,
+                                    activation_type, logistic_output, gamma=gamma,
                                     output='value')
             jac = lambda param: cost_NN(param, x[:,indices], y[indices], layers,
-                                    activation_type, gamma=gamma,
+                                    activation_type, logistic_output, gamma=gamma,
                                     output='gradient')
             # Train model by minimizing the cost function (for the training data).
             # This gives the optimal parameters.
@@ -729,7 +728,7 @@ def cost_NN_only_value(p, x, y, layers, activation_type='sigmoid',
     n, m = np.shape(x)
     # Model parameters, unrolled
     w, b = unroll(p, layers)
-    h = hypothesis_NN(p, x, layers, activation_type, logistic_output)
+    h = hypothesis(p, x, layers, activation_type, logistic_output)
     # Loss values
     if logistic_output:
         # Cross entropy
@@ -827,7 +826,7 @@ def cost_NN(p, x, y, layers, activation_type='sigmoid',
         g = lambda v: relu(v)
         dg = lambda v: drelu(v)
     else:
-        sys.exit("This activation function has not been implemented.")
+        raise Exception("This activation function has not been implemented.")
 
     # Number of features and number of data examples
     n, m = np.shape(x)
@@ -898,4 +897,4 @@ def cost_NN(p, x, y, layers, activation_type='sigmoid',
     elif output == 'value and gradient':
         return c, dp
     else:
-        sys.exit('Output option not possible.')
+        raise Exception('Output option not possible.')

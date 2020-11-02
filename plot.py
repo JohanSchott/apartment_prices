@@ -66,12 +66,12 @@ def visualize_data(x_raw, y_raw, features, y_label, normal_apartment_indices):
     print()
 
 
-def plot_errors(x, y, y_model, normal_apartment_indices):
+def plot_errors(x, y, y_model):
     """
     Plot several figures of the errors between model prediction and data.
     """
     # Relative difference
-    rel_diff = (y_model - y)/np.abs(y)
+    rel_diff = (y_model - y) / np.abs(y)
     m = len(y)
     indices_all = nn.shuffle_and_divide_indices(m)
     labels = ['train', 'cv', 'test']
@@ -81,34 +81,32 @@ def plot_errors(x, y, y_model, normal_apartment_indices):
 
         print('Analyze the worst apartment')
         i = np.argmax(np.abs(rel_diff[indices]))
-        print('csv index:', normal_apartment_indices[indices[i]])
         print('Features:', x[:, indices[i]])
         print('Sold price: ', y[indices[i]], ', model price estimation:', y_model[indices[i]])
         print('Relative difference:', rel_diff[indices[i]], '\n')
-    
+
         print('Identify the worst apartments')
         mask = np.abs(rel_diff[indices]) > 1.5
         print('Relative differences:', rel_diff[indices[mask]])
-        print('csv indices:', normal_apartment_indices[indices[mask]], '\n')
- 
-        print('Mean relative error (%): ', 100*np.mean(np.abs(rel_diff[indices])))
-        print('Median relative error (%) : ', 100*np.median(np.abs(rel_diff[indices])))
-        print('Standard deviation of relative difference (%): ', 100*np.std(rel_diff[indices]))
-        print('Mean relative difference (%): ', 100*np.mean(rel_diff[indices]))
-        print('Min and max relative difference (%): ', 100*np.min(rel_diff[indices]), 100*np.max(rel_diff[indices]))
+
+        print('Mean relative error (%): ', 100 * np.mean(np.abs(rel_diff[indices])))
+        print('Median relative error (%) : ', 100 * np.median(np.abs(rel_diff[indices])))
+        print('Standard deviation of relative difference (%): ', 100 * np.std(rel_diff[indices]))
+        print('Mean relative difference (%): ', 100 * np.mean(rel_diff[indices]))
+        print('Min and max relative difference (%): ', 100 * np.min(rel_diff[indices]), 100 * np.max(rel_diff[indices]))
         print('\n')
 
 
     # Distribution of prices
-    xlim = (0,18*10**6)
+    xlim = (0, 18)
     for label, indices in zip(labels, indices_all):
         plt.figure()
-        plt.hist(y[indices], bins=50, range=xlim, label='exact')
-        plt.hist(y_model[indices], bins=50, range=xlim, label='model', alpha=0.6)
-        plt.xlabel('apartment price (sek)')
-        plt.ylabel('apartment distribution')
+        plt.hist(10**-6 * y[indices], bins=50, range=xlim, label='exact')
+        plt.hist(10**-6 * y_model[indices], bins=50, range=xlim, label='model', alpha=0.6)
+        plt.xlabel('Apartment price (Msek)')
+        plt.ylabel('# apartments')
         plt.legend(loc=0)
-        plt.title(label)
+        plt.title('Price distribution of ' + label + ' data')
         plt.show()
 
     # Distribution of logarithm of prices
@@ -126,9 +124,9 @@ def plot_errors(x, y, y_model, normal_apartment_indices):
 
     # Distribution of relative difference
     plt.figure()
-    alphas = [1, 0.7, 0.4]
+    alphas = [1, 0.5, 0.3]
     for label, indices, alpha in zip(labels, indices_all, alphas):
-        plt.hist(100*rel_diff[indices], bins=50, range=(-40, 40), 
+        plt.hist(100 * rel_diff[indices], bins=50, range=(-40, 40),
                  density=True, label=label, alpha=alpha)
     plt.xlabel('Relative deviation (%)')
     plt.ylabel('apartment distribution')
@@ -160,11 +158,11 @@ def plot_apartments(x, features):
 
 def plot_contours(figure_handle, x, y, z, colorbarlabel=None):
     CS = plt.contourf(x, y, z,
-                      levels=50,
+                      levels=100,
                       cmap=plt.cm.jet, # viridis
                       alpha=0.5,   # vmin=np.max([0, np.min(z)])
                       transform=ccrs.PlateCarree())
-    CS2 = plt.contour(CS, levels=CS.levels[::5], # np.arange(60, 105, 5)
+    CS2 = plt.contour(CS, levels=CS.levels[::2], # np.arange(60, 105, 5)
                       cmap=plt.cm.jet, # viridis
                       alpha=1,    # vmin=np.max([0, np.min(z)])
                       transform=ccrs.PlateCarree())
@@ -194,7 +192,7 @@ def plot_map(longitude_lim, latitude_lim, map_quality=11):
         request = cimgt.StamenTerrain()
     else:
         # Map designs 'OSM' and 'MapboxTiles' do not work
-        sys.exit('Untested map design')
+        raise Exception('Untested map design')
     ax = plt.axes(projection=request.crs)
     gl = ax.gridlines(draw_labels=True, alpha=0., linewidth=0, linestyle='-')
     gl.xlabels_top = gl.ylabels_right = False
@@ -253,15 +251,15 @@ def plot_sthlm_landmarks():
     plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
     plt.text(long, lat + 0.001, 'Telefonplan', transform=ccrs.Geodetic())
     # Huddinge station
-    lat, long =  59.236353, 17.978874 
+    lat, long =  59.236353, 17.978874
     plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
     plt.text(long, lat + 0.001, 'Huddinge', transform=ccrs.Geodetic())
     # Drottningholm
-    lat, long =  59.321684, 17.886840 
+    lat, long =  59.321684, 17.886840
     plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
     plt.text(long, lat + 0.001, 'Drottningholm', transform=ccrs.Geodetic())
     # Täby
-    lat, long = 59.444222, 18.074514 
+    lat, long = 59.444222, 18.074514
     plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
     plt.text(long, lat + 0.001, 'Täby', transform=ccrs.Geodetic())
     # Sollentuna
@@ -269,11 +267,11 @@ def plot_sthlm_landmarks():
     plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
     plt.text(long, lat + 0.001, 'Sollentuna', transform=ccrs.Geodetic())
     # Spånga
-    lat, long =  59.383285, 17.898908 
+    lat, long =  59.383285, 17.898908
     plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
     plt.text(long, lat + 0.001, 'Spånga', transform=ccrs.Geodetic())
     # Bromma airport
-    lat, long =  59.354626, 17.942596 
+    lat, long =  59.354626, 17.942596
     plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
     plt.text(long, lat - 0.004, 'Airport', transform=ccrs.Geodetic())
     # Millesgården
@@ -308,5 +306,3 @@ def plot_sthlm_landmarks():
     lat, long = 59.423529, 17.833041
     plt.plot(long, lat, '.k', transform=ccrs.Geodetic())
     plt.text(long + 0.001, lat + 0.001, 'Jacobsberg', transform=ccrs.Geodetic())
-
-
