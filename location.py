@@ -6,7 +6,7 @@ from geopy.geocoders import Nominatim
 
 def get_location_info(street, city="Stockholm", county="Stockholms län",
                       country="Sweden"):
-    geolocator = Nominatim(user_agent="my-application")  # timeout=5
+    geolocator = Nominatim(user_agent="apartment_prices")  # timeout=5
     location = geolocator.geocode(query={'street':street,
                                          'city':city,
                                          'county':county,
