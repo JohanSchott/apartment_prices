@@ -238,7 +238,7 @@ class Model:
         y_norm = hypothesis(x_norm, self.data['p'], self.data['layers'],
                             self.data['activation_type'])
         # Go back to un-normalized and un-scaled output
-        y = y_norm*self.data['std_y'] + self.data['mu_y']
+        y = y_norm * self.data['std_y'] + self.data['mu_y']
         if self.data['predict_log_value']:
             y = np.exp(y)
         y = y.flatten()
