@@ -12,9 +12,9 @@ from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import matplotlib.ticker as mticker
 import cartopy.io.img_tiles as cimgt
 # Local libraries
-from . import location
-from . import time_stuff
-from . import nn
+from apartment_prices import location
+from apartment_prices import time_stuff
+from apartment_prices import nn
 
 def visualize_data(x_raw, y_raw, features, y_label, normal_apartment_indices):
     # Inspect data
@@ -189,7 +189,7 @@ def plot_map(longitude_lim, latitude_lim, map_quality=11):
     elif map_design == 'QuadtreeTiles':
         request = cimgt.QuadtreeTiles()
     elif map_design == 'StamenTerrain':
-        request = cimgt.StamenTerrain()
+        request = cimgt.Stamen('terrain-background')
     else:
         # Map designs 'OSM' and 'MapboxTiles' do not work
         raise Exception('Untested map design')
@@ -201,7 +201,7 @@ def plot_map(longitude_lim, latitude_lim, map_quality=11):
     gl.xlabel_style = {'size': 10, 'color': 'black'}
     gl.ylabel_style = {'size': 10, 'color': 'black', 'weight': 'normal'}
     ax.set_extent(extent)
-    ax.add_image(request, map_quality, interpolation='spline36')
+    ax.add_image(request, map_quality)
 
 
 def plot_sthlm_landmarks():
