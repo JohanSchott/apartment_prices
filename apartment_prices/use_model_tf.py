@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
 import argparse
+import time
 # Local libraries
 from apartment_prices import time_stuff
 from apartment_prices import location
@@ -161,6 +162,7 @@ def main(ai_name, verbose):
     price_grid = np.zeros_like(longitude_grid, dtype=np.float)
     for i, lat in enumerate(latitudes):
         for j, long in enumerate(longitudes):
+            t0 = time.time()
             print("lat =", lat, "long =", long)
             tmp = apartments['Sankt Göransgatan 96, current time'].copy()
             k = np.where(features == 'latitude')[0][0]
@@ -169,7 +171,9 @@ def main(ai_name, verbose):
             tmp[k] = long
             k = np.where(features == 'distance2SthlmCenter')[0][0]
             tmp[k] = location.distance_2_sthlm_center(lat, long)
+            print("Prepare apartment took", time.time() - t0)
             price_grid[i,j] = model.predict(tmp)
+            assert False
     price_grid[price_grid < 0] = np.nan
     # Plot map and apartment prices
     fig = plt.figure(figsize=(8,8))

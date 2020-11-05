@@ -265,6 +265,7 @@ class Model_tf:
             Number of data examples M.
 
         """
+        import time
         # Convert to shapes expected by tensorflow
         x = np.array(x).T
         if x.ndim == 1:
@@ -281,8 +282,13 @@ class Model_tf:
                 'std_y' in self.data):
             raise Exception('Not all parameters are initioalized...')
         # Normalize and scale input
+        t0 = time.time()
         x_norm = nn.norm_and_scale(x, self.data['mu_x'], self.data['std_x'])
+        print("normalizing input data took", time.time() - t0)
+        t0 = time.time()
         y_norm = self.model.predict(x_norm, batch_size=batch_size)
+        print("forward propagation took", time.time() - t0)
+        t0 = time.time()
         # Go back to un-normalized and un-scaled output
         y = y_norm * self.data['std_y'] + self.data['mu_y']
         if self.model_design['predict_log_value']:
@@ -290,4 +296,5 @@ class Model_tf:
         y = y.flatten()
         if y.size == 1:
             y = y[0]
+        print("de-normaliation took", time.time() - t0)
         return y
