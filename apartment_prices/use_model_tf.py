@@ -155,12 +155,13 @@ def main(ai_name, verbose):
     # Calculate the price for a latitude and longitude mesh
     latitude_lim = [59.233, 59.45]
     longitude_lim = [17.82, 18.19]
-    latitudes = np.linspace(latitude_lim[0], latitude_lim[1], 310)
+    latitudes = np.linspace(latitude_lim[0], latitude_lim[1], 301)
     longitudes = np.linspace(longitude_lim[0], longitude_lim[1], 300)
     longitude_grid, latitude_grid = np.meshgrid(longitudes, latitudes)
     price_grid = np.zeros_like(longitude_grid, dtype=np.float)
     for i, lat in enumerate(latitudes):
         for j, long in enumerate(longitudes):
+            print("lat =", lat, "long =", long)
             tmp = apartments['Sankt Göransgatan 96, current time'].copy()
             k = np.where(features == 'latitude')[0][0]
             tmp[k] = lat

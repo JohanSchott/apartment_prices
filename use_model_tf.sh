@@ -2,14 +2,14 @@
 
 # ----Kungsholmen-----
 # Model 1
-#python use_model_tf.py kungsholmen1
+#python -m apartment_prices.use_model_tf kungsholmen1
 
 # ------Stor-Stockholm--------
 # Model 1
-#python use_model_tf.py stor_stockholm1
+#python -m apartment_prices.use_model_tf stor_stockholm1
 
 # Model 2
-python use_model_tf.py stor_stockholm2
+python -m apartment_prices.use_model_tf stor_stockholm2
 
 
 

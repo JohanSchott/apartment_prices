@@ -21,7 +21,7 @@ from keras import regularizers
 from keras import optimizers
 from keras.models import load_model
 # Local libraries
-from . import nn
+from apartment_prices import nn
 
 
 class Model_tf:

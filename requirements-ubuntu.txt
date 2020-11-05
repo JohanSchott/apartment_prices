@@ -1,0 +1,10 @@
+build-essential
+python3
+python3-dev
+virtualenv
+libgeos-dev
+libproj-dev
+nvidia-cuda-toolkit
+nvidia-modprobe
+liblapack3
+libblas3

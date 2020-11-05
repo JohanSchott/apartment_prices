@@ -5,3 +5,6 @@ docs/_build/*
 # Compiled Modules
 *.pyc
 #*.so
+
+# Generated from requirements.in
+requirements.txt
