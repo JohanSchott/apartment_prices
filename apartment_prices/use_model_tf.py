@@ -12,7 +12,7 @@ Provide some basic information about an apartment, and get an estimate of the va
 """
 
 
-import matplotlib.pylab as plt
+import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
 import argparse
