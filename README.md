@@ -30,7 +30,7 @@ Predict apartment prices in Stockholm using machine learning!
 ### How to get started
 - View the figures in the `figures` folder.
 
-Install libraries and setup Python virtual environment with:
+- Install libraries and setup Python virtual environment with:
 ```basth
 source setup.sh
 ```
