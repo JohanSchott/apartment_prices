@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
 import argparse
+import tensorflow
 # Local libraries
 from apartment_prices import time_stuff
 from apartment_prices import location
@@ -26,6 +27,8 @@ from apartment_prices import prepare
 
 
 def main(ai_name, verbose):
+
+
     model = Model_tf(ai_name)
     features = model.attributes['features']
     y_label = model.attributes['y_label']
@@ -224,5 +227,10 @@ if __name__ == "__main__":
     parser.add_argument("--verbose", type=int, default=1, choices=[0, 1],
                     help="Verbose flag.")
     args = parser.parse_args()
+
+    # This is deprecated. But gives a 30 times speed-up, when predict price for one apartment.
+    # Perhaps speed comparision is different with many apartments?
+    tensorflow.compat.v1.disable_eager_execution()
+
     main(args.ai_name, args.verbose)
 
