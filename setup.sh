@@ -34,8 +34,8 @@ source env.sh
 if [ "$(uname)" == "Darwin" ]; then
     # Mac OS X specific things here
     conda update -n base -c defaults conda
-    conda install -y --file requirements_MAC_OS.txt
-    pip install pytest-pythonpath==0.7.3
+    conda install -y --file requirements-MAC-OS.txt
+    pip install pytest-pythonpath
     pip install geopy==2.0.0
 else
     # Linux (and perhaps Windows)

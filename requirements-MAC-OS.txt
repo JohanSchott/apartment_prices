@@ -1,0 +1,15 @@
+numpy=1.19.2
+pandas=1.1.3
+scipy=1.5.2
+# Python3.7 on MacOS does not support tensorflow higher than 2.0.0 atm. And Python3.8 on MacOS does not support tensorflow at all atm.
+tensorflow=2.0.0
+keras=2.3.1
+matplotlib=3.3.2
+shapely=1.7.1
+cartopy=0.18.0
+h5py=2.10.0
+pytest=6.1.1
+pytest-cov
+pytest-html
+# In order to get rid of an OMP error, which perhaps is a Mac OS specific problem
+nomkl=3.0
