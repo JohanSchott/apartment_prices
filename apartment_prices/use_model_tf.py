@@ -16,7 +16,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
 import argparse
-import time
 # Local libraries
 from apartment_prices import time_stuff
 from apartment_prices import location
@@ -89,7 +88,10 @@ def main(ai_name, verbose):
             for j, apartment in enumerate(apartments.values()):
                 tmp = apartment.copy()
                 tmp[i] = time_stamp
+                import time
+                t0 = time.time()
                 prices[time_counter,j] = model.predict(tmp)
+                print('time:', time.time() - t0)
             time_counter += 1
     # Plot prices
     plt.figure()
@@ -156,14 +158,13 @@ def main(ai_name, verbose):
     # Calculate the price for a latitude and longitude mesh
     latitude_lim = [59.233, 59.45]
     longitude_lim = [17.82, 18.19]
-    latitudes = np.linspace(latitude_lim[0], latitude_lim[1], 301)
-    longitudes = np.linspace(longitude_lim[0], longitude_lim[1], 300)
+    latitudes = np.linspace(latitude_lim[0], latitude_lim[1], 31)
+    longitudes = np.linspace(longitude_lim[0], longitude_lim[1], 30)
     longitude_grid, latitude_grid = np.meshgrid(longitudes, latitudes)
     price_grid = np.zeros_like(longitude_grid, dtype=np.float)
     for i, lat in enumerate(latitudes):
+        print("latitude =", lat)
         for j, long in enumerate(longitudes):
-            t0 = time.time()
-            print("lat =", lat, "long =", long)
             tmp = apartments['Sankt Göransgatan 96, current time'].copy()
             k = np.where(features == 'latitude')[0][0]
             tmp[k] = lat
@@ -171,9 +172,7 @@ def main(ai_name, verbose):
             tmp[k] = long
             k = np.where(features == 'distance2SthlmCenter')[0][0]
             tmp[k] = location.distance_2_sthlm_center(lat, long)
-            print("Prepare apartment took", time.time() - t0)
             price_grid[i,j] = model.predict(tmp)
-            assert False
     price_grid[price_grid < 0] = np.nan
     # Plot map and apartment prices
     fig = plt.figure(figsize=(8,8))
