@@ -1,0 +1,12 @@
+h5py==2.10.0
+matplotlib==3.3.2
+numpy==1.18.5
+pytest==6.1.2
+pytest-cov
+pytest-html
+pytest-pythonpath
+scipy==1.5.2
+tensorflow==2.3.1
+keras==2.4.3
+pandas==1.1.4
+geopy==2.0.0

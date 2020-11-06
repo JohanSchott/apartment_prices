@@ -1,0 +1,4 @@
+shapely=1.7.1
+cartopy=0.18.0
+# In order to get rid of an OMP error, which perhaps is a Mac OS specific problem
+nomkl=3.0.0

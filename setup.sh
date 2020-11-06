@@ -20,6 +20,7 @@ fi
 # Create virtual environment
 if [ "$(uname)" == "Darwin" ]; then
     # Mac OS X specific things here
+    # Do not manage to install Python library cartopy on Python3.8
     conda create -y --name envMap python=3.7
 else
     # Linux (and perhaps Windows)
@@ -31,16 +32,16 @@ fi
 source env.sh
 
 # Install Python libraries.
+pip install -U pip==20.0.2
+pip install pip-compile-multi
 if [ "$(uname)" == "Darwin" ]; then
     # Mac OS X specific things here
     conda update -n base -c defaults conda
-    conda install -y --file requirements-MAC-OS.txt
-    pip install pytest-pythonpath
-    pip install geopy==2.0.0
+    pip-compile requirements-MAC-OS-pip.in
+    pip install -r requirements-MAC-OS-pip.txt
+    conda install -y --file requirements-MAC-OS-conda.txt
 else
     # Linux (and perhaps Windows)
-    pip install -U pip==20.0.2
-    pip install pip-compile-multi
     pip-compile requirements.in
     pip install -r requirements.txt
 fi
