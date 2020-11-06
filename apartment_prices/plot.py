@@ -195,7 +195,8 @@ def plot_map(longitude_lim, latitude_lim, map_quality=11):
         raise Exception('Untested map design')
     ax = plt.axes(projection=request.crs)
     gl = ax.gridlines(draw_labels=True, alpha=0., linewidth=0, linestyle='-')
-    gl.xlabels_top = gl.ylabels_right = False
+    gl.top_labels = False
+    gl.right_labels = False
     gl.xformatter = LONGITUDE_FORMATTER
     gl.yformatter = LATITUDE_FORMATTER
     gl.xlabel_style = {'size': 10, 'color': 'black'}
