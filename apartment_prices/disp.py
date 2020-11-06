@@ -1,5 +1,8 @@
 
+
+import time
 from datetime import datetime
+
 
 def apartment_into(features, apartment, model=None):
     for feature, value in zip(features, apartment):
@@ -9,7 +12,9 @@ def apartment_into(features, apartment, model=None):
         else:
             print(feature + ': {:.2f}'.format(value))
     if model != None:
-        print('Predicted apartment price: {:.1f} Msek \n'.format(model.predict(apartment) / 10**6))
+        t0 = time.time()
+        print('Predicted apartment price: {:.1f} Msek.'.format(model.predict(apartment) / 10**6))
+        print("It took {:.1f} ms to predict the prize.\n".format(1000 * (time.time() - t0)))
     else:
         print('')
 
