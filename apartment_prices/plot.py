@@ -137,11 +137,12 @@ def plot_errors(x, y, y_model):
 def plot_apartments_in_color(x, features, color, colorbarlabel):
     i = np.where(features == 'latitude')[0][0]
     j = np.where(features == 'longitude')[0][0]
+    std = np.std(color)
     # Relative deviation in procentage
     sc = plt.scatter(x[j,:], x[i,:], s=0.01, c=color,
-                     vmin=-2*np.std(color), vmax=2*np.std(color),
+                     vmin=-2 * std, vmax=2 * std,
                      cmap=plt.cm.seismic, label='data',
-                     transform=ccrs.Geodetic())
+                     transform=ccrs.PlateCarree())
     cbar = plt.colorbar(sc)
     if colorbarlabel != None:
         cbar.ax.set_ylabel(colorbarlabel)
@@ -150,21 +151,20 @@ def plot_apartments_in_color(x, features, color, colorbarlabel):
 def plot_apartments(x, features):
     i = np.where(features == 'latitude')[0][0]
     j = np.where(features == 'longitude')[0][0]
-    # Relative deviation in procentage
     sc = plt.scatter(x[j,:], x[i,:], s=0.01, c='m',
                      label='data',  # cmap=plt.cm.seismic,
-                     transform=ccrs.Geodetic())
+                     transform=ccrs.PlateCarree())
 
 
 def plot_contours(figure_handle, x, y, z, colorbarlabel=None):
     CS = plt.contourf(x, y, z,
                       levels=100,
                       cmap=plt.cm.jet, # viridis
-                      alpha=0.5,   # vmin=np.max([0, np.min(z)])
+                      alpha=0.3,   # vmin=np.max([0, np.min(z)])
                       transform=ccrs.PlateCarree())
     CS2 = plt.contour(CS, levels=CS.levels[::2], # np.arange(60, 105, 5)
                       cmap=plt.cm.jet, # viridis
-                      alpha=1,    # vmin=np.max([0, np.min(z)])
+                      alpha=0.8,    # vmin=np.max([0, np.min(z)])
                       transform=ccrs.PlateCarree())
     # Make a colorbar for the ContourSet returned by the contourf call.
     cbar = figure_handle.colorbar(CS)
