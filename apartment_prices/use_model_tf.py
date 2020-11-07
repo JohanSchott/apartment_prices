@@ -17,6 +17,7 @@ import numpy as np
 from datetime import datetime
 import argparse
 import tensorflow
+import time
 # Local libraries
 from apartment_prices import time_stuff
 from apartment_prices import location
@@ -24,6 +25,29 @@ from apartment_prices import plot
 from apartment_prices import disp
 from apartment_prices.nn_tf import Model_tf
 from apartment_prices import prepare
+
+
+def get_price_on_grid(model, apartment, latitudes, longitudes, features):
+    """
+    Return apartment prices on a grid, as well as latitudes and longitudes
+    """
+    longitude_grid, latitude_grid = np.meshgrid(longitudes, latitudes)
+    t0 = time.time()
+    apartments_on_grid = np.zeros((len(features), len(latitudes) * len(longitudes)), dtype=np.float32)
+    k_lat = np.where(features == 'latitude')[0][0]
+    k_long = np.where(features == 'longitude')[0][0]
+    k_distance2SthmlCenter = np.where(features == 'distance2SthlmCenter')[0][0]
+    apartment_index = 0
+    for latitude in latitudes:
+        for longitude in longitudes:
+            apartments_on_grid[:, apartment_index] = apartment.copy()
+            apartments_on_grid[k_lat, apartment_index] = latitude
+            apartments_on_grid[k_long, apartment_index] = longitude
+            apartments_on_grid[k_distance2SthmlCenter, apartment_index] = location.distance_2_sthlm_center(latitude, longitude)
+            apartment_index += 1
+    price_grid = model.predict(apartments_on_grid).reshape(len(latitudes), len(longitudes))
+    print('Predicting prices on the grid took {:.1f} seconds'.format(time.time() - t0))
+    return price_grid, longitude_grid, latitude_grid
 
 
 def main(ai_name, verbose):
@@ -147,44 +171,31 @@ def main(ai_name, verbose):
     # Keep all paramteres fixed except for the position related features
     # (such as latitude and longitude, and distace to Stockholm's center).
     # Examples of possibly interesting parameter values are:
+    # - Sankt Göransgatan 96, at the present time
     # - Median apartment in Stockholm, at the present/current time
 
-    # Change to current time
-    i = np.where(features == 'soldDate')[0][0]
-    apartments['Sankt Göransgatan 96, current time'] = apartments['Sankt Göransgatan 96'].copy()
-    apartments['Sankt Göransgatan 96, current time'][i] = datetime.now().timestamp()
-    # Calculate the price for a latitude and longitude mesh
     latitude_lim = [59.233, 59.45]
     longitude_lim = [17.82, 18.19]
+    # Change to current time
+    i = np.where(features == 'soldDate')[0][0]
+    apartment_reference = apartments['Sankt Göransgatan 96'].copy()
+    apartment_reference[i] = datetime.now().timestamp()
     latitudes = np.linspace(latitude_lim[0], latitude_lim[1], 301)
     longitudes = np.linspace(longitude_lim[0], longitude_lim[1], 300)
-    longitude_grid, latitude_grid = np.meshgrid(longitudes, latitudes)
-    price_grid = np.zeros_like(longitude_grid, dtype=np.float)
-    for i, lat in enumerate(latitudes):
-        print("latitude =", lat)
-        for j, long in enumerate(longitudes):
-            tmp = apartments['Sankt Göransgatan 96, current time'].copy()
-            k = np.where(features == 'latitude')[0][0]
-            tmp[k] = lat
-            k = np.where(features == 'longitude')[0][0]
-            tmp[k] = long
-            k = np.where(features == 'distance2SthlmCenter')[0][0]
-            tmp[k] = location.distance_2_sthlm_center(lat, long)
-            price_grid[i,j] = model.predict(tmp)
+    price_grid, longitude_grid, latitude_grid = get_price_on_grid(model,
+                                                                  apartment_reference,
+                                                                  latitudes, longitudes,
+                                                                  features)
     price_grid[price_grid < 0] = np.nan
     # Plot map and apartment prices
-    fig = plt.figure(figsize=(8,8))
-    # map rendering quality. 6 is very bad, 10 is ok, 12 is good, 13 is very good, 14 excellent
-    map_quality = 12
-    plot.plot_map(longitude_lim, latitude_lim, map_quality)
+    fig = plt.figure(figsize=(8, 8))
+    plot.plot_map(longitude_lim, latitude_lim, map_quality=12)
     # Plot the price
     i = np.where(features == 'livingArea')[0][0]
     plot.plot_contours(fig, longitude_grid, latitude_grid,
-                       price_grid / (apartments['Sankt Göransgatan 96, current time'][i] * 10**3),
+                       price_grid / (apartment_reference[i] * 10**3),
                        colorbarlabel=r'price/$m^2$ (ksek)')
-    # Plot landmarks of Stockholm
     plot.plot_sthlm_landmarks()
-    # Plot design
     plt.legend(loc=1)
     plt.xlabel('longitude')
     plt.ylabel('latitude')
@@ -198,16 +209,11 @@ def main(ai_name, verbose):
         for j, long in enumerate(longitudes):
             d2c_grid[i,j] = location.distance_2_sthlm_center(lat, long)
     fig = plt.figure(figsize=(8,8))
-    # map rendering quality. 6 is very bad, 10 is ok, 12 is good, 13 is very good, 14 excellent
-    map_quality = 12
-    plot.plot_map(longitude_lim, latitude_lim, map_quality)
-    # Plot distance
+    plot.plot_map(longitude_lim, latitude_lim, map_quality=12)
     plot.plot_contours(fig, longitude_grid, latitude_grid,
                        d2c_grid,
                        colorbarlabel=r'distance to center  (km)')
-    # Plot landmarks of Stockholm
     plot.plot_sthlm_landmarks()
-    # Plot design
     plt.legend(loc=1)
     plt.xlabel('longitude')
     plt.ylabel('latitude')
@@ -224,7 +230,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # This is deprecated. But gives a 30 times speed-up, when predict price for one apartment.
-    # Perhaps speed comparision is different with many apartments?
+    # With more apartments the difference is much smaller.
     tensorflow.compat.v1.disable_eager_execution()
 
     main(args.ai_name, args.verbose)
