@@ -139,7 +139,24 @@ def plot_price_change_with_size(model, apartments):
     plt.show()
 
 
-def plot_price_on_map(model, apartment, latitudes, longitudes):
+def plot_price_on_map(model, apartment, latitudes, longitudes, x=None):
+    """
+    Plot map with contour lines of apartment prices.
+
+    Parameters
+    ----------
+    model : Model_tf
+
+    apartments : list
+
+    latitudes : ndarray(N)
+
+    longitudes : ndarray(M)
+
+    x : None or ndarray(K,L)
+        If not None, represents K features for L different apartments.
+
+    """
     features = model.attributes['features']
     i = np.where(features == 'soldDate')[0][0]
     apartment_reference = apartment.copy()
@@ -153,6 +170,8 @@ def plot_price_on_map(model, apartment, latitudes, longitudes):
     # Plot map and apartment prices
     fig = plt.figure(figsize=(8, 8))
     plot.plot_map([longitudes[0], longitudes[-1]], [latitudes[0], latitudes[-1]], map_quality=12)
+    if x is not None:
+        plot.plot_apartments(x, features)
     # Plot the price
     i = np.where(features == 'livingArea')[0][0]
     plot.plot_contours(fig, longitude_grid, latitude_grid,
