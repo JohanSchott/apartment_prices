@@ -102,9 +102,9 @@ def main(ai_name, verbose):
     # Time evolve apartments
     i = np.where(features == 'soldDate')[0][0]
     years = range(2013, 2022)
-    months = range(1,13)
-    times = np.zeros(len(years)*len(months))
-    prices = np.zeros((len(years)*len(months), len(apartments)))
+    months = range(1, 13)
+    times = np.zeros(len(years) * len(months))
+    prices = np.zeros((len(years) * len(months), len(apartments)))
     time_counter = 0
     for year in years:
         for month in months:
@@ -113,17 +113,17 @@ def main(ai_name, verbose):
             for j, apartment in enumerate(apartments.values()):
                 tmp = apartment.copy()
                 tmp[i] = time_stamp
-                prices[time_counter,j] = model.predict(tmp)
+                prices[time_counter, j] = model.predict(tmp)
             time_counter += 1
     # Plot prices
     plt.figure()
     for j, (label, apartment) in enumerate(apartments.items()):
-        plt.plot(times, prices[:,j]/10**6, '-', label=label)
+        plt.plot(times, prices[:, j] / 10**6, '-', label=label)
         # Plot current price
         tmp = apartment.copy()
         time_stamp = datetime.now().timestamp()
         tmp[i] = time_stamp
-        plt.plot(time_stamp, model.predict(tmp)/10**6, 'o', color='k')
+        plt.plot(time_stamp, model.predict(tmp) / 10**6, 'o', color='k')
     plt.xlabel('time')
     plt.ylabel('price (Msek)')
     plt.xticks([time_stuff.get_time_stamp(year, 1, 1) for year in years], years)
@@ -148,15 +148,15 @@ def main(ai_name, verbose):
         for k, area in enumerate(areas):
             # Change area
             tmp[area_index] = area
-            price_density[k, j] = model.predict(tmp)/area
+            price_density[k, j] = model.predict(tmp) / area
     # Plot price density
     plt.figure()
     for j, (label, apartment) in enumerate(apartments.items()):
-        plt.plot(areas, price_density[:,j]/1000, '-', label=label)
+        plt.plot(areas, price_density[:,j] / 1000, '-', label=label)
         # Plot price density for actual area size, at current time
         tmp = apartment.copy()
         tmp[time_index] = time_stamp
-        plt.plot(tmp[area_index], model.predict(tmp)/(tmp[area_index]*1000), 'o', color='k')
+        plt.plot(tmp[area_index], model.predict(tmp) / (tmp[area_index] * 1000), 'o', color='k')
     plt.xlabel(feature + '  ($m^2$)')
     plt.ylabel('price/livingArea (ksek/$m^2$)')
     plt.grid()
