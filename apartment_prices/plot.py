@@ -177,6 +177,17 @@ def plot_contours(figure_handle, x, y, z, colorbarlabel=None):
 def plot_map(longitude_lim, latitude_lim, map_quality=11):
     """
     Plot map.
+
+    Parameters
+    ----------
+    longitude_lim : list(2)
+
+    latitude_lim : list(2)
+
+    map_quality : int
+        Map rendering quality.
+        6 is very bad, 10 is ok, 12 is good, 13 is very good, 14 excellent.
+
     """
     # Map extent
     eps = 0*0.01
