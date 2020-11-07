@@ -158,13 +158,13 @@ def plot_apartments(x, features):
 
 def plot_contours(figure_handle, x, y, z, colorbarlabel=None):
     CS = plt.contourf(x, y, z,
-                      levels=100,
-                      cmap=plt.cm.jet, # viridis
-                      alpha=0.3,   # vmin=np.max([0, np.min(z)])
+                      levels=50,
+                      cmap=plt.cm.jet,
+                      alpha=0.1,
                       transform=ccrs.PlateCarree())
-    CS2 = plt.contour(CS, levels=CS.levels[::2], # np.arange(60, 105, 5)
-                      cmap=plt.cm.jet, # viridis
-                      alpha=0.8,    # vmin=np.max([0, np.min(z)])
+    CS2 = plt.contour(CS, levels=CS.levels[::1],
+                      cmap=plt.cm.jet,
+                      alpha=0.8,
                       transform=ccrs.PlateCarree())
     # Make a colorbar for the ContourSet returned by the contourf call.
     cbar = figure_handle.colorbar(CS)
