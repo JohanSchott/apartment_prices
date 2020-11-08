@@ -6,8 +6,6 @@ Provide some basic information about an apartment, and get an estimate of the va
 ### *) Load machine learning (ML) model
 ### *) Provide basic apartment information
 ### *) Estimate prices in Stockholm!
-#### **) Analyze specific addresses
-#### **) Create contour color-map of Stockholm
 
 """
 
@@ -249,8 +247,6 @@ def main(ai_name, verbose):
 
     # Estimate prices in Stockholm!
 
-    # 4.1) Analyze specific addresses in detail
-
     # Print apartment info and predicted prices
     for label, apartment in apartments.items():
         print(label)
@@ -262,7 +258,7 @@ def main(ai_name, verbose):
     # Price as function of m^2
     plot_price_change_with_size(model, apartments)
 
-    # 4.2) Create contour color-map of Stockholm
+    # Create contour color-map of Stockholm
     # Model the apartment price on a grid of geographical positions.
     # Keep all paramteres fixed except for the position related features
     # (such as latitude and longitude, and distace to Stockholm's center).
