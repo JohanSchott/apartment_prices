@@ -26,6 +26,14 @@ Predict apartment prices in Stockholm using machine learning!
 <figcaption>Price per m^2 for some apartments as function of apartment size.</figcaption>
 </figure>
 
+<figure>
+<div class="row">
+  <div class="column">
+  <img src="figures/price_floor.png" alt="Stockholm" width="700"/>
+</div>
+<figcaption>Price per m^2 for some apartments as function of floor number.</figcaption>
+</figure>
+
 
 ### How to get started
 - View the figures in the `figures` folder.
