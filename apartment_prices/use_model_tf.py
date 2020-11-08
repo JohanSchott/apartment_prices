@@ -122,7 +122,7 @@ def plot_price_change_with_size(model, apartments):
     # Plot price density
     plt.figure()
     for j, (label, apartment) in enumerate(apartments.items()):
-        plt.plot(areas, price_density[:,j] / 1000, '-', label=label)
+        plt.plot(areas, price_density[:, j] / 1000, '-', label=label)
         # Plot price density for actual area size, at current time
         tmp = apartment.copy()
         tmp[time_index] = time_stamp
@@ -134,6 +134,41 @@ def plot_price_change_with_size(model, apartments):
     plt.tight_layout()
     plt.savefig('figures/price_density_new.pdf')
     plt.savefig('figures/price_density_new.png')
+    plt.show()
+
+
+def plot_price_change_with_floor(model, apartments):
+    feature = 'floor'
+    features = model.attributes['features']
+    floor_index = np.where(features == feature)[0][0]
+    area_index = np.where(features == 'livingArea')[0][0]
+    time_index = np.where(features == 'soldDate')[0][0]
+    floors = np.arange(11)
+    price_density = np.zeros((len(floors), len(apartments)))
+    time_stamp = datetime.now().timestamp()
+    for j, apartment in enumerate(apartments.values()):
+        # Change to current time
+        tmp = apartment.copy()
+        tmp[time_index] = time_stamp
+        for k, floor in enumerate(floors):
+            # Change floor
+            tmp[floor_index] = floor
+            price_density[k, j] = model.predict(tmp) / tmp[area_index]
+    # Plot price density vs floor
+    plt.figure()
+    for j, (label, apartment) in enumerate(apartments.items()):
+        plt.plot(floors, price_density[:, j] / 1000, '-', label=label)
+        # Plot price density for actual floor, at current time
+        tmp = apartment.copy()
+        tmp[time_index] = time_stamp
+        plt.plot(tmp[floor_index], model.predict(tmp) / (tmp[area_index] * 1000), 'o', color='k')
+    plt.xlabel(feature)
+    plt.ylabel('price/livingArea (ksek/$m^2$)')
+    plt.grid()
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig('figures/price_floor_new.pdf')
+    plt.savefig('figures/price_floor_new.png')
     plt.show()
 
 
@@ -257,6 +292,11 @@ def main(ai_name, verbose):
 
     # Price as function of m^2
     plot_price_change_with_size(model, apartments)
+
+    # FIXME: Price as a function of floor number.
+    plot_price_change_with_floor(model, apartments)
+
+    # FIXME: Price as a function of building year.
 
     # Create contour color-map of Stockholm
     # Model the apartment price on a grid of geographical positions.
