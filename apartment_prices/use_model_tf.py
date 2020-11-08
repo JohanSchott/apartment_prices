@@ -172,6 +172,41 @@ def plot_price_change_with_floor(model, apartments):
     plt.show()
 
 
+def plot_price_change_with_building_year(model, apartments):
+    feature = 'constructionYear'
+    features = model.attributes['features']
+    construction_index = np.where(features == feature)[0][0]
+    area_index = np.where(features == 'livingArea')[0][0]
+    time_index = np.where(features == 'soldDate')[0][0]
+    construction_years = np.arange(1900, 2020, 2)
+    price_density = np.zeros((len(construction_years), len(apartments)))
+    time_stamp = datetime.now().timestamp()
+    for j, apartment in enumerate(apartments.values()):
+        # Change to current time
+        tmp = apartment.copy()
+        tmp[time_index] = time_stamp
+        for k, construction_year in enumerate(construction_years):
+            # Change construction year
+            tmp[construction_index] = construction_year
+            price_density[k, j] = model.predict(tmp) / tmp[area_index]
+    # Plot price density vs floor
+    plt.figure()
+    for j, (label, apartment) in enumerate(apartments.items()):
+        plt.plot(construction_years, price_density[:, j] / 1000, '-', label=label)
+        # Plot price density for actual construction year, at current time
+        tmp = apartment.copy()
+        tmp[time_index] = time_stamp
+        plt.plot(tmp[construction_index], model.predict(tmp) / (tmp[area_index] * 1000), 'o', color='k')
+    plt.xlabel(feature)
+    plt.ylabel('price/livingArea (ksek/$m^2$)')
+    plt.grid()
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig('figures/price_construction_new.pdf')
+    plt.savefig('figures/price_construction_new.png')
+    plt.show()
+
+
 def plot_price_on_map(model, apartment, latitudes, longitudes, x=None):
     """
     Plot map with contour lines of apartment prices.
@@ -293,10 +328,9 @@ def main(ai_name, verbose):
     # Price as function of m^2
     plot_price_change_with_size(model, apartments)
 
-    # FIXME: Price as a function of floor number.
     plot_price_change_with_floor(model, apartments)
 
-    # FIXME: Price as a function of building year.
+    plot_price_change_with_building_year(model, apartments)
 
     # Create contour color-map of Stockholm
     # Model the apartment price on a grid of geographical positions.
