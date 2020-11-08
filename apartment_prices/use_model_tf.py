@@ -247,7 +247,7 @@ def main(ai_name, verbose):
 
     # Estimate prices in Stockholm!
 
-    # Print apartment info and predicted prices
+    # Print apartment info and predict prices
     for label, apartment in apartments.items():
         print(label)
         disp.apartment_into(features, apartment, model)
