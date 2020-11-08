@@ -322,10 +322,8 @@ def main(ai_name, verbose):
         print(label)
         disp.apartment_into(features, apartment, model)
 
-    # Time evolve apartments
     plot_price_change_over_time(model, apartments)
 
-    # Price as function of m^2
     plot_price_change_with_size(model, apartments)
 
     plot_price_change_with_floor(model, apartments)
