@@ -82,21 +82,30 @@ def plot_price_change_over_time(model, apartments):
     features = model.attributes['features']
     times, prices = get_price_history(model, apartments.values())
     time_index = np.where(features == 'soldDate')[0][0]
-    # Plot prices
-    plt.figure()
+    area_index = np.where(features == 'livingArea')[0][0]
+    fig, axes = plt.subplots(nrows=2, sharex=True)
     for j, (label, apartment) in enumerate(apartments.items()):
-        plt.plot(times, prices[:, j] / 10**6, '-', label=label)
+        axes[0].plot(times, prices[:, j] / 10**6, '-', label=label)
+        axes[1].plot(times, prices[:, j] / (apartment[area_index] * 10**3), '-', label=label)
         # Plot current price
         tmp = apartment.copy()
         time_stamp = datetime.now().timestamp()
         tmp[time_index] = time_stamp
-        plt.plot(time_stamp, model.predict(tmp) / 10**6, 'o', color='k')
-    plt.xlabel('time')
-    plt.ylabel('price (Msek)')
+        price_tmp = model.predict(tmp)
+        axes[0].plot(time_stamp, price_tmp / 10**6, 'o', color='k')
+        axes[1].plot(time_stamp, price_tmp / (tmp[area_index] * 10**3), 'o', color='k')
+    axes[1].set_xlabel('time')
+    axes[0].set_ylabel('price (Msek)')
+    axes[1].set_ylabel('price/livingArea (ksek/$m^2$)')
     years = range(datetime.utcfromtimestamp(np.min(times)).year, datetime.utcfromtimestamp(np.max(times)).year + 1)
-    plt.xticks([time_stuff.get_time_stamp(year, 1, 1) for year in years], years)
-    plt.grid()
-    plt.legend()
+    axes[0].set_xticks([time_stuff.get_time_stamp(year, 1, 1) for year in years])
+    axes[0].set_xticklabels(years)
+    axes[1].set_xticks([time_stuff.get_time_stamp(year, 1, 1) for year in years])
+    axes[1].set_xticklabels(years)
+    axes[0].grid()
+    axes[1].grid()
+    axes[0].legend()
+    axes[1].legend()
     plt.tight_layout()
     plt.savefig('figures/time_evolve_new.pdf')
     plt.savefig('figures/time_evolve_new.png')
