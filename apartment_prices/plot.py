@@ -156,9 +156,9 @@ def plot_apartments(x, features):
                      transform=ccrs.PlateCarree())
 
 
-def plot_contours(figure_handle, x, y, z, colorbarlabel=None):
+def plot_contours(figure_handle, x, y, z, levels=50, colorbarlabel=None):
     CS = plt.contourf(x, y, z,
-                      levels=50,
+                      levels=levels,
                       cmap=plt.cm.jet,
                       alpha=0.1,
                       transform=ccrs.PlateCarree())
