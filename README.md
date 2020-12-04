@@ -7,7 +7,7 @@ Predict apartment prices in Stockholm using machine learning!
   <div class="column">
   <img src="figures/sthlm.png" alt="Stockholm" width="700"/>
 </div>
-<figcaption>Apartment prices in Stockholm, for the median apartment in Stockholm.</figcaption>
+<figcaption>Apartment prices in Stockholm. All apartment features are the same on the map, except the position.</figcaption>
 </figure>
 
 <figure>
