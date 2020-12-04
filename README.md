@@ -50,7 +50,7 @@ Predict apartment prices in Stockholm using machine learning!
 source setup.sh
 ```
 
-- Load a (trained) neural network model, and generate a map of Stockholm with apartment prices color-coded:
+- Load a (trained) neural network model, and generate a map of Stockholm with apartment prices color-coded, as well as two videos of how the prices in the region have changed over time:
 ```bash
 source use_model_tf.sh
 ```
