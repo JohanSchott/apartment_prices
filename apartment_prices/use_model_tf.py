@@ -261,8 +261,10 @@ def plot_price_on_map(model, apartment, latitudes, longitudes, x=None):
     plt.show()
 
 
-def video_of_price_on_map(model, apartment, latitudes, longitudes, x=None):
+def videos_on_map(model, apartment, latitudes, longitudes, x=None):
     """
+    Videos
+
     Video of map with contour lines of apartment prices, when vary time.
 
     Parameters
@@ -282,6 +284,7 @@ def video_of_price_on_map(model, apartment, latitudes, longitudes, x=None):
     years = range(2013, 2021)
     months = range(1, 13)
     days = (1, 15)
+
     features = model.attributes['features']
     time_index = np.where(features == 'soldDate')[0][0]
     times = np.zeros(len(years) * len(months) * len(days))
@@ -307,31 +310,42 @@ def video_of_price_on_map(model, apartment, latitudes, longitudes, x=None):
     area_index = np.where(features == 'livingArea')[0][0]
     # price per m^2 (ksek)
     prices /= apartment_reference[area_index] * 10**3
+    price_change = 100 * ((prices / prices[0]) - 1)
+
+    make_video_on_map(times, prices, longitude_grid, latitude_grid, features, x,
+                      filename_keyword="sthlm_new", colorbarlabel=r'price/$m^2$ (ksek)')
+    make_video_on_map(times, price_change, longitude_grid, latitude_grid, features, x,
+                      filename_keyword="sthlm_change_new", colorbarlabel=r'price change  (%)')
+
+
+def make_video_on_map(times, prices, longitude_grid, latitude_grid, features=None, x=None, filename_keyword="sthlm_new", colorbarlabel=""):
     levels = np.linspace(np.min(prices), np.max(prices), 50)
+    longitude_lim = np.min(longitude_grid), np.max(longitude_grid)
+    latitude_lim = np.min(latitude_grid), np.max(latitude_grid)
     filenames = []
     for time_stamp, price_grid in zip(times, prices):
         fig = plt.figure(figsize=(8, 8))
-        plot.plot_map([longitudes[0], longitudes[-1]], [latitudes[0], latitudes[-1]], map_quality=12)
+        plot.plot_map(longitude_lim, latitude_lim, map_quality=12)
         if x is not None:
             plot.plot_apartments(x, features)
         plot.plot_contours(fig, longitude_grid, latitude_grid,
                            price_grid,
                            levels=levels,
-                           colorbarlabel=r'price/$m^2$ (ksek)')
+                           colorbarlabel=colorbarlabel)
         plot.plot_sthlm_landmarks()
         plt.legend(loc=1)
         plt.xlabel('longitude')
         plt.ylabel('latitude')
         t = datetime.fromtimestamp(time_stamp)
         plt.title('year: {:4d}, month: {:2d}, day: {:2d}'.format(t.year, t.month, t.day))
-        filename = 'figures/sthlm_new_' + 'year' + str(t.year) + '_month' + str(t.month) + '_day' + str(t.day) + '.png'
+        filename = 'figures/' + filename_keyword + '_year' + str(t.year) + '_month' + str(t.month) + '_day' + str(t.day) + '.png'
         plt.savefig(filename)
         plt.close()
         filenames.append(filename)
     # Make video from figures
     fps = 32.0
-    video.pngs_to_movie(filenames, movie_filename='figures/sthlm_new.mp4', codec='mp4v', fps=fps)
-    video.pngs_to_gif(filenames, movie_filename='figures/sthlm_new.gif', fps=fps)
+    video.pngs_to_movie(filenames, movie_filename='figures/' + filename_keyword + '.mp4', codec='mp4v', fps=fps)
+    #video.pngs_to_gif(filenames, movie_filename='figures/' + filename_keyword + '.gif', fps=fps)
 
 
 def plot_distance_to_ceneter_on_map(latitudes, longitudes):
@@ -424,7 +438,7 @@ def main(ai_name, verbose):
     plot_price_on_map(model, apartments['Sankt Göransgatan 96'], latitudes, longitudes)
 
     # Movie about how prices on map vary over time
-    video_of_price_on_map(model, apartments['Sankt Göransgatan 96'], latitudes, longitudes)
+    videos_on_map(model, apartments['Sankt Göransgatan 96'], latitudes, longitudes)
 
     plot_distance_to_ceneter_on_map(latitudes, longitudes)
 
