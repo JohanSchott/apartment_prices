@@ -55,5 +55,5 @@ source setup.sh
 source use_model_tf.sh
 ```
 
-- Edit the python file `use_model_tf.py` to something you are interested in.
+- Edit the python file `use_model_tf.py` to something you are interested in, e.g. add an apartment to be analyzed.
 
