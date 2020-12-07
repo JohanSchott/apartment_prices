@@ -160,7 +160,7 @@ def plot_contours(figure_handle, x, y, z, levels=50, colorbarlabel=None):
     CS = plt.contourf(x, y, z,
                       levels=levels,
                       cmap=plt.cm.jet,
-                      alpha=0.1,
+                      alpha=0.05,
                       transform=ccrs.PlateCarree())
     CS2 = plt.contour(CS, levels=CS.levels[::1],
                       cmap=plt.cm.jet,
