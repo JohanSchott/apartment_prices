@@ -8,3 +8,4 @@ docs/_build/*
 
 # Generated from requirements.in
 requirements.txt
+requirements-MAC-OS-pip.txt
