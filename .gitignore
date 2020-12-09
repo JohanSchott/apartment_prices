@@ -6,6 +6,8 @@ docs/_build/*
 *.pyc
 #*.so
 
+.DS_Store
+
 # Generated from requirements.in
 requirements.txt
 requirements-MAC-OS-pip.txt
