@@ -57,3 +57,20 @@ source use_model_tf.sh
 
 - Edit the python file `use_model_tf.py` to something you are interested in, e.g. add an apartment to be analyzed.
 
+### Tests
+Type
+```bash
+pytest
+```
+to perform the (unit) tests in the `test`-folder.
+
+### Documentation
+The documentation of this package is found in the directory `docs`.
+
+To update the manual, type:
+
+```bash
+cd docs && sphinx-apidoc -f --implicit-namespaces -o . ../apartment_prices && make html
+```
+to generate a html-page.
+
