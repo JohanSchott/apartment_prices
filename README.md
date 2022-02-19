@@ -45,9 +45,14 @@ Predict apartment prices in Stockholm using machine learning!
 ### How to get started
 - View the figures in the `figures` folder.
 
-- Install libraries and setup Python virtual environment with:
+- Install libraries:
 ```bash
-source setup.sh
+./install.sh
+```
+
+- Activate Python virtual environment and set PYTHONPATH.
+```bash
+source env.sh
 ```
 
 - Load a (trained) neural network model, and generate a map of Stockholm with apartment prices color-coded, as well as two videos of how the prices in the region have changed over time:
@@ -58,11 +63,10 @@ source use_model_tf.sh
 - Edit the python file `use_model_tf.py` to something you are interested in, e.g. add an apartment to be analyzed.
 
 ### Tests
-Type
+Check unit-tests with
 ```bash
 pytest
 ```
-to perform the (unit) tests in the `test`-folder.
 
 ### Documentation
 The documentation of this package is found in the directory `docs`.
