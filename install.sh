@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 # Change to script folder.
 cd "$( dirname "${BASH_SOURCE[0]}" )"
