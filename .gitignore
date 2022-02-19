@@ -10,4 +10,7 @@ docs/_build/*
 
 # Generated from requirements.in
 requirements.txt
-requirements-MAC-OS-pip.txt
+
+figures/*_new.pdf
+figures/*_new.png
+figures/video/*

@@ -338,14 +338,14 @@ def make_video_on_map(times, prices, longitude_grid, latitude_grid, features=Non
         plt.ylabel('latitude')
         t = datetime.fromtimestamp(time_stamp)
         plt.title('year: {:4d}, month: {:2d}, day: {:2d}'.format(t.year, t.month, t.day))
-        filename = 'figures/' + filename_keyword + '_year' + str(t.year) + '_month' + str(t.month) + '_day' + str(t.day) + '.png'
+        filename = 'figures/video/' + filename_keyword + '_year' + str(t.year) + '_month' + str(t.month) + '_day' + str(t.day) + '.png'
         plt.savefig(filename)
         plt.close()
         filenames.append(filename)
     # Make video from figures
     fps = 32.0
-    video.pngs_to_movie(filenames, movie_filename='figures/' + filename_keyword + '.mp4', codec='mp4v', fps=fps)
-    #video.pngs_to_gif(filenames, movie_filename='figures/' + filename_keyword + '.gif', fps=fps)
+    video.pngs_to_movie(filenames, movie_filename='figures/video/' + filename_keyword + '.mp4', codec='mp4v', fps=fps)
+    #video.pngs_to_gif(filenames, movie_filename='figures/video/' + filename_keyword + '.gif', fps=fps)
 
 
 def plot_distance_to_ceneter_on_map(latitudes, longitudes):
