@@ -1,5 +1,3 @@
-
-
 """
 
 nn
@@ -13,6 +11,7 @@ This module contains a neural network class.
 import numpy as np
 import h5py
 import sys
+
 # Tensorflow libraries
 import tensorflow as tf
 from keras.models import Sequential
@@ -20,6 +19,7 @@ from keras.layers import Dense, Activation
 from keras import regularizers
 from keras import optimizers
 from keras.models import load_model
+
 # Local libraries
 from apartment_prices import nn
 
@@ -50,13 +50,13 @@ class Model_tf:
             # Create new model
             self.create_new_model(model_design.copy(), attributes.copy())
         else:
-            raise Exception('Wrong input parameters')
+            raise Exception("Wrong input parameters")
         # Sanity checks
-        assert 'activation_type' in self.model_design
-        assert 'layers' in self.model_design
-        assert 'predict_log_value' in self.model_design
-        assert 'features' in self.attributes
-        assert len(self.attributes['features']) == self.model_design['layers'][0]
+        assert "activation_type" in self.model_design
+        assert "layers" in self.model_design
+        assert "predict_log_value" in self.model_design
+        assert "features" in self.attributes
+        assert len(self.attributes["features"]) == self.model_design["layers"][0]
 
     def create_new_model(self, model_design, attributes):
         self.model_design = model_design
@@ -66,27 +66,31 @@ class Model_tf:
         # Create Tensorflow model object
         model = Sequential()
         self.model = model
-        for i, layer in enumerate(model_design['layers'][1:]):
+        for i, layer in enumerate(model_design["layers"][1:]):
             if i == 0:
                 # First hidden layer
-                model.add(Dense(layer,
-                                kernel_regularizer=regularizers.l2(model_design['gamma']),
-                                input_dim=model_design['layers'][0]))
-                model.add(Activation(model_design['activation_type']))
-            elif i == len(model_design['layers'][1:]) - 1:
+                model.add(
+                    Dense(
+                        layer,
+                        kernel_regularizer=regularizers.l2(model_design["gamma"]),
+                        input_dim=model_design["layers"][0],
+                    )
+                )
+                model.add(Activation(model_design["activation_type"]))
+            elif i == len(model_design["layers"][1:]) - 1:
                 # Last layer
                 assert layer == 1
                 # No activation function on the last layer
-                model.add(Dense(layer, kernel_regularizer=regularizers.l2(model_design['gamma'])))
+                model.add(Dense(layer, kernel_regularizer=regularizers.l2(model_design["gamma"])))
             else:
-                model.add(Dense(layer, kernel_regularizer=regularizers.l2(model_design['gamma'])))
-                model.add(Activation(model_design['activation_type']))
+                model.add(Dense(layer, kernel_regularizer=regularizers.l2(model_design["gamma"])))
+                model.add(Activation(model_design["activation_type"]))
             optimizer = optimizers.Adam()
-            #optimizer = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+            # optimizer = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
             # For a mean squared error regression problem
-            #self.model.compile(optimizer='rmsprop', loss='mse')
-            model.compile(optimizer=optimizer, loss='mse')
-            #self.model.compile(optimizer=optimizer, loss='mae')
+            # self.model.compile(optimizer='rmsprop', loss='mse')
+            model.compile(optimizer=optimizer, loss="mse")
+            # self.model.compile(optimizer=optimizer, loss='mae')
 
     def load_existing_model(self):
         """
@@ -100,21 +104,21 @@ class Model_tf:
         self.attributes = {}
         self.data = {}
         # Read the meta-file
-        with h5py.File(filename_meta, 'r') as meta_file:
-            group = meta_file['model_design']
+        with h5py.File(filename_meta, "r") as meta_file:
+            group = meta_file["model_design"]
             for key, value in group.items():
                 self.model_design[key] = value[()]
-            group = meta_file['attributes']
+            group = meta_file["attributes"]
             for key, value in group.attrs.items():
                 self.attributes[key] = value
-            group = meta_file['data']
+            group = meta_file["data"]
             for key, value in group.items():
                 self.data[key] = value[()]
         # Sanity checks
-        if 'mu_x' in self.data:
-            assert self.data['mu_x'].shape[1] == self.model_design['layers'][0]
-        if 'std_x' in self.data:
-            assert self.data['std_x'].shape[1] == self.model_design['layers'][0]
+        if "mu_x" in self.data:
+            assert self.data["mu_x"].shape[1] == self.model_design["layers"][0]
+        if "std_x" in self.data:
+            assert self.data["std_x"].shape[1] == self.model_design["layers"][0]
 
     def save_to_files(self, verbose):
         """
@@ -126,17 +130,17 @@ class Model_tf:
         # Save tensorflow model
         self.model.save(filename_model_tf)
         # Save meta data
-        with h5py.File(filename_meta,'w') as meta_file:
+        with h5py.File(filename_meta, "w") as meta_file:
             # Save model design parameters
-            group = meta_file.create_group('model_design')
+            group = meta_file.create_group("model_design")
             for key, value in self.model_design.items():
                 group.create_dataset(key, data=value)
             # Save attributes (each a list of strings)
-            group = meta_file.create_group('attributes')
+            group = meta_file.create_group("attributes")
             for key, value in self.attributes.items():
                 group.attrs.create(key, value, dtype=h5py.special_dtype(vlen=str))
             # Save some performance results and meta data.
-            group = meta_file.create_group('data')
+            group = meta_file.create_group("data")
             for key, value in self.data.items():
                 group.create_dataset(key, data=value)
 
@@ -145,8 +149,7 @@ class Model_tf:
         filename_meta = "models/" + self.ai_name + "_meta.hdf5"
         return filename_model_tf, filename_meta
 
-    def fit(self, x_train, y_train, x_cv, y_cv,
-              batch_size=10000, epochs=1, verbose=1):
+    def fit(self, x_train, y_train, x_cv, y_cv, batch_size=10000, epochs=1, verbose=1):
         """
         Train neural network model.
 
@@ -176,60 +179,60 @@ class Model_tf:
         # (ln(m)-ln(y))^2 instead of (m-y)^2.
         # When m approx y, this can be Taylor expanded into ((m-y)/y)^2.
         # Hence the relative error is minimized instead of the absolute error.
-        if self.model_design['predict_log_value']:
+        if self.model_design["predict_log_value"]:
             # Fit to logarithm of the output (instead of fitting to the output).
             y_train = np.log(y_train)
             y_cv = np.log(y_cv)
         # Print the number of neural network parameters
-        r = nn.get_number_of_NN_parameters(self.model_design['layers'])
-        print('{:d} parameters, {:d} training examples'.format(r, y_train.shape[0]))
+        r = nn.get_number_of_NN_parameters(self.model_design["layers"])
+        print("{:d} parameters, {:d} training examples".format(r, y_train.shape[0]))
         # Normalization and scaling parameters
         mu_x, std_x = nn.get_norm_and_scale(x_train, axis=0)
         mu_y, std_y = nn.get_norm_and_scale(y_train, axis=0)
         # Set default values
-        if not 'mu_x' in self.data:
-            self.data['mu_x'] = mu_x
-        if not 'std_x' in self.data:
-            self.data['std_x'] = std_x
-        if not 'mu_y' in self.data:
-            self.data['mu_y'] = mu_y
-        if not 'std_y' in self.data:
-            self.data['std_y'] = std_y
+        if not "mu_x" in self.data:
+            self.data["mu_x"] = mu_x
+        if not "std_x" in self.data:
+            self.data["std_x"] = std_x
+        if not "mu_y" in self.data:
+            self.data["mu_y"] = mu_y
+        if not "std_y" in self.data:
+            self.data["std_y"] = std_y
         # Normalized and scaled data
-        x_train = (x_train - self.data['mu_x']) / self.data['std_x']
-        x_cv = (x_cv - self.data['mu_x']) / self.data['std_x']
-        y_train = (y_train - self.data['mu_y']) / self.data['std_y']
-        y_cv = (y_cv - self.data['mu_y']) / self.data['std_y']
+        x_train = (x_train - self.data["mu_x"]) / self.data["std_x"]
+        x_cv = (x_cv - self.data["mu_x"]) / self.data["std_x"]
+        y_train = (y_train - self.data["mu_y"]) / self.data["std_y"]
+        y_cv = (y_cv - self.data["mu_y"]) / self.data["std_y"]
         # Fit model to data
-        history = self.model.fit(x_train, y_train,
-                                 validation_data=(x_cv, y_cv),
-                                 batch_size=batch_size, epochs=epochs,
-                                 verbose=verbose)
+        history = self.model.fit(
+            x_train, y_train, validation_data=(x_cv, y_cv), batch_size=batch_size, epochs=epochs, verbose=verbose
+        )
         # Training and cross-validation cost values
         if x_train.ndim == 2:
             batch_size = min(10000, x_train.shape[0])
         else:
             batch_size = None
-        self.data['cost_train'] = self.model.evaluate(x_train, y_train, batch_size=batch_size)
+        self.data["cost_train"] = self.model.evaluate(x_train, y_train, batch_size=batch_size)
         if x_cv.ndim == 2:
             batch_size = min(10000, x_cv.shape[0])
         else:
             batch_size = None
-        self.data['cost_cv'] = self.model.evaluate(x_cv, y_cv, batch_size=batch_size)
+        self.data["cost_cv"] = self.model.evaluate(x_cv, y_cv, batch_size=batch_size)
         return history
-
 
     def evaluate(self, x, y, batch_size=None):
         """
         Return cost function value.
         """
         # Sanity checks
-        if not ('predict_log_value' in self.model_design and
-                'mu_x' in self.data and
-                'std_x' in self.data and
-                'mu_y' in self.data and
-                'std_y' in self.data):
-            raise Exception('Not all parameters are initioalized...')
+        if not (
+            "predict_log_value" in self.model_design
+            and "mu_x" in self.data
+            and "std_x" in self.data
+            and "mu_y" in self.data
+            and "std_y" in self.data
+        ):
+            raise Exception("Not all parameters are initioalized...")
         assert x.shape[1] == len(y)
         if batch_size == None and x.ndim == 2:
             batch_size = min(10000, x.shape[1])
@@ -240,19 +243,18 @@ class Model_tf:
         if x.ndim == 1:
             x = np.atleast_2d(x)
         elif x.ndim > 2:
-            raise Exception('Unexpected input dimension of apartment features')
+            raise Exception("Unexpected input dimension of apartment features")
         # If predict_log_value is True, the cost function will be of the form:
         # (ln(m)-ln(y))^2 instead of (m-y)^2.
         # When m approx y, this can be Taylor expanded into ((m-y)/y)^2.
         # Hence the relative error is minimized instead of the absolute error.
-        if self.model_design['predict_log_value']:
+        if self.model_design["predict_log_value"]:
             # Fit to logarithm of the output (instead of fitting to the output).
             y = np.log(y)
         # Normalize and scale input
-        x_norm = nn.norm_and_scale(x, self.data['mu_x'], self.data['std_x'])
-        y_norm = nn.norm_and_scale(y, self.data['mu_y'], self.data['std_y'])
+        x_norm = nn.norm_and_scale(x, self.data["mu_x"], self.data["std_x"])
+        y_norm = nn.norm_and_scale(y, self.data["mu_y"], self.data["std_y"])
         return self.model.evaluate(x_norm, y_norm, batch_size=batch_size)
-
 
     def predict(self, x, batch_size=None):
         """
@@ -270,22 +272,24 @@ class Model_tf:
         if x.ndim == 1:
             x = np.atleast_2d(x)
         elif x.ndim > 2:
-            raise Exception('Unexpected input dimension of apartment features')
+            raise Exception("Unexpected input dimension of apartment features")
         if batch_size == None and x.ndim == 2:
             batch_size = min(10000, x.shape[1])
         # Sanity checks
-        if not ('predict_log_value' in self.model_design and
-                'mu_x' in self.data and
-                'std_x' in self.data and
-                'mu_y' in self.data and
-                'std_y' in self.data):
-            raise Exception('Not all parameters are initioalized...')
+        if not (
+            "predict_log_value" in self.model_design
+            and "mu_x" in self.data
+            and "std_x" in self.data
+            and "mu_y" in self.data
+            and "std_y" in self.data
+        ):
+            raise Exception("Not all parameters are initioalized...")
         # Normalize and scale input
-        x_norm = nn.norm_and_scale(x, self.data['mu_x'], self.data['std_x'])
+        x_norm = nn.norm_and_scale(x, self.data["mu_x"], self.data["std_x"])
         y_norm = self.model.predict(x_norm, batch_size=batch_size)
         # Go back to un-normalized and un-scaled output
-        y = y_norm * self.data['std_y'] + self.data['mu_y']
-        if self.model_design['predict_log_value']:
+        y = y_norm * self.data["std_y"] + self.data["mu_y"]
+        if self.model_design["predict_log_value"]:
             y = np.exp(y)
         y = y.flatten()
         if y.size == 1:

@@ -15,15 +15,16 @@ import time
 import pandas as pd
 import h5py
 import os
+
 # Local stuff
 from apartment_prices import time_stuff
 from apartment_prices import location
 
 
 def read_csv_and_save_processed_data_to_hdf5(csv_file):
-        hdf5_file = csv_file[:-3] + 'hdf5'
-        x, y, normal_apartment_indices, y_label, features = load_and_setup_data(csv_file)
-        write_to_hdf5(hdf5_file, x, y, features, y_label)
+    hdf5_file = csv_file[:-3] + "hdf5"
+    x, y, normal_apartment_indices, y_label, features = load_and_setup_data(csv_file)
+    write_to_hdf5(hdf5_file, x, y, features, y_label)
 
 
 def load_apartment_data(filename_hdf5, wanted_features=None):
@@ -68,25 +69,29 @@ def load_and_setup_data(csv_filename, features=None):
     features : list
 
     """
-    y_label = 'soldPrice'
+    y_label = "soldPrice"
     if features is None:
         # Select features (among apartment property labels)
-        features = np.array(['soldDate',
-                             'livingArea',
-                             'rooms',
-                             'rent',
-                             'floor',
-                             'constructionYear',
-                             'latitude',
-                             'longitude',
-                             'distance2SthlmCenter'])
+        features = np.array(
+            [
+                "soldDate",
+                "livingArea",
+                "rooms",
+                "rent",
+                "floor",
+                "constructionYear",
+                "latitude",
+                "longitude",
+                "distance2SthlmCenter",
+            ]
+        )
     # Read data apartment data from .csv file.
     df = pd.read_csv(csv_filename)
     # Apartment labels
     labels = np.array(df.columns[1:])
     # Apartment data
-    apartments = df.values[:,1:]
-    print('All apartment properties:')
+    apartments = df.values[:, 1:]
+    print("All apartment properties:")
     for label in labels:
         print(label)
     print()
@@ -125,8 +130,8 @@ def setup_data(apartments, labels, features, y_label):
     # Feature data
     x = []
     normal_apartments = []
-    k_lati = np.where(labels == 'latitude')[0][0]
-    k_long = np.where(labels == 'longitude')[0][0]
+    k_lati = np.where(labels == "latitude")[0][0]
+    k_long = np.where(labels == "longitude")[0][0]
     # Loop over all apartments
     for i in range(np.shape(apartments)[0]):
         # Resonable values: exclude apartments that are weird.
@@ -135,41 +140,41 @@ def setup_data(apartments, labels, features, y_label):
         # have too big price change from the starting price,
         # too high rent
         # or are strange is some other way.
-        j = np.where(labels == 'livingArea')[0][0]
-        if float(apartments[i,j]) < 10:
+        j = np.where(labels == "livingArea")[0][0]
+        if float(apartments[i, j]) < 10:
             # Skip this apartment, too small
             continue
-        if float(apartments[i,j]) > 150:
+        if float(apartments[i, j]) > 150:
             # Skip this apartment, too big
             continue
-        j = np.where(labels == 'soldPrice')[0][0]
-        if float(apartments[i,j]) < 0.5*10**6:
+        j = np.where(labels == "soldPrice")[0][0]
+        if float(apartments[i, j]) < 0.5 * 10**6:
             # Skip this apartment, too cheap
             continue
-        if float(apartments[i,j]) > 20*10**6:
+        if float(apartments[i, j]) > 20 * 10**6:
             # Skip this apartment, too expensive
             continue
-        j2 = np.where(labels == 'listPrice')[0][0]
-        if float(apartments[i,j2]) != 0:
-            if float(apartments[i,j])/float(apartments[i,j2]) < 0.6:
+        j2 = np.where(labels == "listPrice")[0][0]
+        if float(apartments[i, j2]) != 0:
+            if float(apartments[i, j]) / float(apartments[i, j2]) < 0.6:
                 # Skip this apartment, too big decrease
                 continue
-            if float(apartments[i,j])/float(apartments[i,j2]) > 2.5:
+            if float(apartments[i, j]) / float(apartments[i, j2]) > 2.5:
                 # Skip this apartment, too big increase
                 continue
         else:
             # Skip this apartment, zero list price is a bit weird...
             continue
-        j = np.where(labels == 'rent')[0][0]
-        if float(apartments[i,j]) > 20000:
+        j = np.where(labels == "rent")[0][0]
+        if float(apartments[i, j]) > 20000:
             # Skip this apartment, too high rent
             continue
-        j = np.where(labels == 'rooms')[0][0]
-        if float(apartments[i,j]) > 15:
+        j = np.where(labels == "rooms")[0][0]
+        if float(apartments[i, j]) > 15:
             # Skip this apartment, too many rooms
             continue
-        j = np.where(labels == 'floor')[0][0]
-        if float(apartments[i,j]) > 36:
+        j = np.where(labels == "floor")[0][0]
+        if float(apartments[i, j]) > 36:
             # Skip this apartment, too high floor.
             # According to wiki, the most number of floors in Stockholm
             # is at the moment (2019) 36 floors.
@@ -178,20 +183,21 @@ def setup_data(apartments, labels, features, y_label):
         for j, feature in enumerate(features):
             if feature in labels:
                 k = np.where(labels == feature)[0][0]
-                if feature == 'soldDate':
-                    year = int(apartments[i,k][:4])
-                    month = int(apartments[i,k][5:7])
-                    day = int(apartments[i,k][8:9])
+                if feature == "soldDate":
+                    year = int(apartments[i, k][:4])
+                    month = int(apartments[i, k][5:7])
+                    day = int(apartments[i, k][8:9])
                     apartment[j] = time_stuff.get_time_stamp(year, month, day)
                 else:
-                    apartment[j] = float(apartments[i,k])
-            elif feature == 'distance2SthlmCenter':
+                    apartment[j] = float(apartments[i, k])
+            elif feature == "distance2SthlmCenter":
                 apartment[j] = location.distance_2_sthlm_center(
-                    float(apartments[i,k_lati]), float(apartments[i,k_long]))
-            #elif feature == 'sizePerRoom':
-                #x_raw, features = preparation.add_size_per_room_as_feature(x_raw, features)
+                    float(apartments[i, k_lati]), float(apartments[i, k_long])
+                )
+            # elif feature == 'sizePerRoom':
+            # x_raw, features = preparation.add_size_per_room_as_feature(x_raw, features)
             else:
-                raise Exception('Feature ' + feature + ' does not exist...')
+                raise Exception("Feature " + feature + " does not exist...")
         # An apartment reaching this point is considered normal
         normal_apartments.append(i)
         x.append(apartment)
@@ -202,8 +208,7 @@ def setup_data(apartments, labels, features, y_label):
     y_label_index = np.where(labels == y_label)[0][0]
     # Output vector
     y = np.array(apartments[normal_apartments, y_label_index], dtype=np.float)
-    print('{:d} apartments are un-normal and are excluded.'.format(
-        len(apartments)-len(normal_apartments)))
+    print("{:d} apartments are un-normal and are excluded.".format(len(apartments) - len(normal_apartments)))
 
     # Transpose for later convinience
     x = x.T
@@ -220,8 +225,8 @@ def replace_missing_values(x):
     n, m = np.shape(x)
     s = 0
     for i in range(n):
-        mask = np.isnan(x[i,:])
+        mask = np.isnan(x[i, :])
         s += np.sum(mask)
-        x[i,mask] = np.mean(x[i, np.logical_not(mask)])
+        x[i, mask] = np.mean(x[i, np.logical_not(mask)])
     if s > 0:
-        print('{:d} NaN values are replaced with feature mean values'.format(s))
+        print("{:d} NaN values are replaced with feature mean values".format(s))

@@ -1,17 +1,13 @@
-
 import numpy as np
 from math import pi
 from geopy.geocoders import Nominatim
 
 
-def get_location_info(street, city="Stockholm", county="Stockholms län",
-                      country="Sweden"):
+def get_location_info(street, city="Stockholm", county="Stockholms län", country="Sweden"):
     geolocator = Nominatim(user_agent="apartment_prices")  # timeout=5
-    location = geolocator.geocode(query={'street':street,
-                                         'city':city,
-                                         'county':county,
-                                         'country':country})
+    location = geolocator.geocode(query={"street": street, "city": city, "county": county, "country": country})
     return location
+
 
 def distance_2_sthlm_center(latitude, longitude):
     """
@@ -28,8 +24,9 @@ def distance_2_sthlm_center(latitude, longitude):
 
 
 def get_distance2center_function(latitude_c, longitude_c):
-    distance2center_function = lambda latitude, longitude : get_great_circle_distance(
-        latitude, longitude, latitude_c, longitude_c)
+    distance2center_function = lambda latitude, longitude: get_great_circle_distance(
+        latitude, longitude, latitude_c, longitude_c
+    )
     return distance2center_function
 
 
@@ -48,14 +45,11 @@ def get_great_circle_distance(latitude, longitude, latitude_c, longitude_c):
     # Convert to spherical coordinates theta and phi
     theta, phi = get_spherical_coordinates(latitude, longitude)
     theta_c, phi_c = get_spherical_coordinates(latitude_c, longitude_c)
-    distance = get_great_circle_distance_using_spherical_coordinates(
-        theta, phi, theta_c, phi_c)
+    distance = get_great_circle_distance_using_spherical_coordinates(theta, phi, theta_c, phi_c)
     return distance
 
 
-def get_great_circle_distance_using_spherical_coordinates(theta, phi,
-                                                          theta_c, phi_c,
-                                                          r=6371.):
+def get_great_circle_distance_using_spherical_coordinates(theta, phi, theta_c, phi_c, r=6371.0):
     """
     Return the great circle distance to point c.
 
@@ -70,9 +64,8 @@ def get_great_circle_distance_using_spherical_coordinates(theta, phi,
 
     """
     # Angle between point and point c.
-    dalpha = np.arccos(np.sin(theta)*np.sin(theta_c)*np.cos(phi-phi_c)
-                       + np.cos(theta)*np.cos(theta_c))
-    return r*dalpha
+    dalpha = np.arccos(np.sin(theta) * np.sin(theta_c) * np.cos(phi - phi_c) + np.cos(theta) * np.cos(theta_c))
+    return r * dalpha
 
 
 def get_cartesian_distance(latitude, longitude, latitude_c, longitude_c):
@@ -93,11 +86,11 @@ def get_cartesian_distance(latitude, longitude, latitude_c, longitude_c):
     distance = np.zeros_like(latitude, dtype=np.float)
     if distance.ndim == 0:
         for i in range(3):
-            distance += (float(pos[i,:]) - float(pos_c[i]))**2
+            distance += (float(pos[i, :]) - float(pos_c[i])) ** 2
         distance = float(np.sqrt(distance))
     else:
         for i in range(3):
-            distance += (pos[i,:] - float(pos_c[i]))**2
+            distance += (pos[i, :] - float(pos_c[i])) ** 2
         distance = np.sqrt(distance)
     return distance
 
@@ -113,17 +106,17 @@ def get_spherical_coordinates(latitude, longitude):
 
     """
     # Convert to spherical coordinates theta and phi
-    theta = pi/2 - latitude*pi/180
+    theta = pi / 2 - latitude * pi / 180
     phi = np.zeros_like(longitude, dtype=np.float)
     if phi.ndim == 0:
         if longitude >= 0:
-            phi = longitude*pi/180
+            phi = longitude * pi / 180
         else:
-            phi = 2*pi + longitude*pi/180
+            phi = 2 * pi + longitude * pi / 180
     else:
         mask = longitude >= 0
-        phi[mask] = longitude[mask]*pi/180
-        phi[np.logical_not(mask)] = 2*pi + longitude[np.logical_not(mask)]*pi/180
+        phi[mask] = longitude[mask] * pi / 180
+        phi[np.logical_not(mask)] = 2 * pi + longitude[np.logical_not(mask)] * pi / 180
     return theta, phi
 
 
@@ -134,7 +127,7 @@ def get_cartesian_coordinates(latitude, longitude):
     return pos
 
 
-def spherical2cartesian_coordinates(theta, phi, r=6371.):
+def spherical2cartesian_coordinates(theta, phi, r=6371.0):
     """
     Return cartesian coordinates.
 
@@ -146,9 +139,8 @@ def spherical2cartesian_coordinates(theta, phi, r=6371.):
         Default value is the radius of the earth in km.
 
     """
-    pos_x = r*np.sin(theta)*np.cos(phi)
-    pos_y = r*np.sin(theta)*np.sin(phi)
-    pos_z = r*np.cos(theta)
+    pos_x = r * np.sin(theta) * np.cos(phi)
+    pos_y = r * np.sin(theta) * np.sin(phi)
+    pos_z = r * np.cos(theta)
     pos = np.atleast_2d([pos_x, pos_y, pos_z]).T
     return pos
-
