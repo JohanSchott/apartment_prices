@@ -57,7 +57,7 @@ source env.sh
 
 - Load a (trained) neural network model, and generate a map of Stockholm with apartment prices color-coded, as well as two videos of how the prices in the region have changed over time:
 ```bash
-source use_model_tf.sh
+./use_model_tf.sh
 ```
 
 - Edit the python file `use_model_tf.py` to something you are interested in, e.g. add an apartment to be analyzed.
