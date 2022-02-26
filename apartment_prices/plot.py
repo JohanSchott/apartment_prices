@@ -1,10 +1,8 @@
-#!/usr/bin/env python
+"""Module for plotting."""
 
-# Module for plotting.
-
+from datetime import datetime
 import matplotlib.pylab as plt
 import numpy as np
-from datetime import datetime
 
 # cartopy related libraries
 import cartopy.crs as ccrs

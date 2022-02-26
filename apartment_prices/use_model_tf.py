@@ -12,12 +12,12 @@ at any desired time!
 """
 
 
-import matplotlib.pyplot as plt
-import numpy as np
 from datetime import datetime
 import argparse
-import tensorflow
 import time
+import matplotlib.pyplot as plt
+import numpy as np
+import tensorflow
 
 # Local libraries
 from apartment_prices import time_stuff

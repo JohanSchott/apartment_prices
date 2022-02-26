@@ -1,5 +1,5 @@
-import numpy as np
 from math import pi
+import numpy as np
 from geopy.geocoders import Nominatim
 
 

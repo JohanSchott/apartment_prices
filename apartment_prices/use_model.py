@@ -12,9 +12,9 @@ at any desired time!
 """
 
 
+from datetime import datetime
 import matplotlib.pylab as plt
 import numpy as np
-from datetime import datetime
 
 # Local libraries
 from apartment_prices import time_stuff

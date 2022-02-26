@@ -1,7 +1,7 @@
-import cv2
-import imageio
 import argparse
 import os
+import cv2
+import imageio
 
 
 def pngs_to_movie(png_filenames, movie_filename="output.mp4", codec="mp4v", fps=20.0):
