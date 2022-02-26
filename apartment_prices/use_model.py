@@ -181,7 +181,7 @@ def main():
     latitudes = np.linspace(latitude_lim[0], latitude_lim[1], 310)
     longitudes = np.linspace(longitude_lim[0], longitude_lim[1], 300)
     longitude_grid, latitude_grid = np.meshgrid(longitudes, latitudes)
-    price_grid = np.zeros_like(longitude_grid, dtype=np.float)
+    price_grid = np.zeros_like(longitude_grid, dtype=float)
     for i, lat in enumerate(latitudes):
         for j, long in enumerate(longitudes):
             tmp = apartments["median apartment, current time"].copy()
@@ -218,7 +218,7 @@ def main():
     plt.show()
 
     # Plot figure with distance to Stockholm center
-    d2c_grid = np.zeros_like(longitude_grid, dtype=np.float)
+    d2c_grid = np.zeros_like(longitude_grid, dtype=float)
     for i, lat in enumerate(latitudes):
         for j, long in enumerate(longitudes):
             d2c_grid[i, j] = location.distance_2_sthlm_center(lat, long)

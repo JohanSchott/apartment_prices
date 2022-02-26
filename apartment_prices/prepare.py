@@ -174,7 +174,7 @@ def setup_data(apartments, labels, features, y_label):
             # According to wiki, the most number of floors in Stockholm
             # is at the moment (2019) 36 floors.
             continue
-        apartment = np.zeros(len(features), dtype=np.float)
+        apartment = np.zeros(len(features), dtype=float)
         for j, feature in enumerate(features):
             if feature in labels:
                 k = np.where(labels == feature)[0][0]
@@ -202,7 +202,7 @@ def setup_data(apartments, labels, features, y_label):
     # Output index
     y_label_index = np.where(labels == y_label)[0][0]
     # Output vector
-    y = np.array(apartments[normal_apartments, y_label_index], dtype=np.float)
+    y = np.array(apartments[normal_apartments, y_label_index], dtype=float)
     print("{:d} apartments are un-normal and are excluded.".format(len(apartments) - len(normal_apartments)))
 
     # Transpose for later convinience

@@ -1,5 +1,7 @@
 from math import pi
+from typing import Union
 import numpy as np
+from numpy import ndarray
 from geopy.geocoders import Nominatim
 
 
@@ -74,15 +76,19 @@ def get_cartesian_distance(latitude, longitude, latitude_c, longitude_c):
     pos = get_cartesian_coordinates(latitude, longitude)
     pos_c = get_cartesian_coordinates(latitude_c, longitude_c)
     # Calculate the distance to the center point
-    distance = np.zeros_like(latitude, dtype=np.float)
-    if distance.ndim == 0:
+    distance: Union[float, ndarray]
+    if isinstance(latitude, float) and isinstance(longitude, float):
+        distance = 0.0
         for i in range(3):
             distance += (float(pos[i, :]) - float(pos_c[i])) ** 2
         distance = float(np.sqrt(distance))
-    else:
+    elif isinstance(latitude, ndarray) and isinstance(longitude, ndarray):
+        distance = np.zeros_like(latitude, dtype=float)
         for i in range(3):
             distance += (pos[i, :] - float(pos_c[i])) ** 2
         distance = np.sqrt(distance)
+    else:
+        raise TypeError()
     return distance
 
 
@@ -98,7 +104,7 @@ def get_spherical_coordinates(latitude, longitude):
     """
     # Convert to spherical coordinates theta and phi
     theta = pi / 2 - latitude * pi / 180
-    phi = np.zeros_like(longitude, dtype=np.float)
+    phi = np.zeros_like(longitude, dtype=float)
     if phi.ndim == 0:
         if longitude >= 0:
             phi = longitude * pi / 180

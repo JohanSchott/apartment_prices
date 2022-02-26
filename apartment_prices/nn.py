@@ -4,7 +4,9 @@ This module contains a neural network class and some useful neural network funct
 
 
 from functools import partial
+from typing import Any
 import numpy as np
+from numpy import ndarray
 import h5py
 from scipy.optimize import minimize
 import scipy.special
@@ -510,7 +512,7 @@ def gradient_descent(fun, jac, p_initial, alpha=0.05, maxiter=10**4, rel_df_tol=
 
     """
     p = p_initial.copy()
-    info = {}
+    info: dict[str, Any] = {}
     f_old_value = np.nan
     for i in range(maxiter):
         # Calculate function and its gradient
@@ -678,7 +680,7 @@ def get_minimization_solution(
     batches = m // batchsize
     print("Start minimizing NN cost function")
     print("{:d} epochs, {:d} batches (each of size {:d}) \n".format(epochs, batches, batchsize))
-    hist = {"cost": []}
+    hist: dict[str, list] = {"cost": []}
     n_prints = 10
     counter = 0
     for epoch in range(epochs):
@@ -895,7 +897,7 @@ def cost_NN(p, x, y, layers, activation_type="sigmoid", logistic_output=False, g
     # Forward propagation
     # Parallelized version, no loop over examples
     z = []
-    a = []
+    a: list[ndarray] = []
     for j, (wm, bv) in enumerate(zip(w, b)):
         # First to second layer is treated specially
         if j == 0:
@@ -928,8 +930,8 @@ def cost_NN(p, x, y, layers, activation_type="sigmoid", logistic_output=False, g
 
     # Partial derivatives of the cost function using
     # back-propagation.
-    dw = []
-    db = []
+    dw: list[ndarray] = []
+    db: list[ndarray] = []
     # Parallelized version, no loop over examples
     for j in range(len(layers) - 1)[-1::-1]:
         # Last layer is treated specially

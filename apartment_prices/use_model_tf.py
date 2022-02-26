@@ -382,7 +382,7 @@ def make_video_on_map(
 def plot_distance_to_ceneter_on_map(latitudes, longitudes):
     # Plot figure with distance to Stockholm center
     longitude_grid, latitude_grid = np.meshgrid(longitudes, latitudes)
-    d2c_grid = np.zeros_like(longitude_grid, dtype=np.float)
+    d2c_grid = np.zeros_like(longitude_grid, dtype=float)
     for i, lat in enumerate(latitudes):
         for j, long in enumerate(longitudes):
             d2c_grid[i, j] = location.distance_2_sthlm_center(lat, long)
