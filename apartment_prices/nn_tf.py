@@ -10,10 +10,8 @@ This module contains a neural network class.
 
 import numpy as np
 import h5py
-import sys
 
 # Tensorflow libraries
-import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras import regularizers
@@ -43,10 +41,10 @@ class Model_tf:
 
         """
         self.ai_name = ai_name
-        if model_design == None and attributes == None:
+        if model_design is None and attributes is None:
             # Load an existing model
             self.load_existing_model()
-        elif model_design != None and attributes != None:
+        elif model_design is not None and attributes is not None:
             # Create new model
             self.create_new_model(model_design.copy(), attributes.copy())
         else:
@@ -190,13 +188,13 @@ class Model_tf:
         mu_x, std_x = nn.get_norm_and_scale(x_train, axis=0)
         mu_y, std_y = nn.get_norm_and_scale(y_train, axis=0)
         # Set default values
-        if not "mu_x" in self.data:
+        if "mu_x" not in self.data:
             self.data["mu_x"] = mu_x
-        if not "std_x" in self.data:
+        if "std_x" not in self.data:
             self.data["std_x"] = std_x
-        if not "mu_y" in self.data:
+        if "mu_y" not in self.data:
             self.data["mu_y"] = mu_y
-        if not "std_y" in self.data:
+        if "std_y" not in self.data:
             self.data["std_y"] = std_y
         # Normalized and scaled data
         x_train = (x_train - self.data["mu_x"]) / self.data["std_x"]
@@ -234,7 +232,7 @@ class Model_tf:
         ):
             raise Exception("Not all parameters are initioalized...")
         assert x.shape[1] == len(y)
-        if batch_size == None and x.ndim == 2:
+        if batch_size is None and x.ndim == 2:
             batch_size = min(10000, x.shape[1])
 
         # Convert to shapes expected by tensorflow
@@ -273,7 +271,7 @@ class Model_tf:
             x = np.atleast_2d(x)
         elif x.ndim > 2:
             raise Exception("Unexpected input dimension of apartment features")
-        if batch_size == None and x.ndim == 2:
+        if batch_size is None and x.ndim == 2:
             batch_size = min(10000, x.shape[1])
         # Sanity checks
         if not (

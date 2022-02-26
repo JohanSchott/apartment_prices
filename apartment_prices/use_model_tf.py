@@ -1,6 +1,8 @@
 """
 # Predict house prices
-Provide some basic information about an apartment, and get an estimate of the value of the apartment, at any desired time!
+
+Provide some basic information about an apartment, and get an estimate of the value of the apartment,
+at any desired time!
 
 ## Workflow
 ### *) Load machine learning (ML) model
@@ -22,7 +24,6 @@ from apartment_prices import time_stuff
 from apartment_prices import location
 from apartment_prices import plot
 from apartment_prices import disp
-from apartment_prices import prepare
 from apartment_prices import video
 from apartment_prices.nn_tf import Model_tf
 
@@ -402,6 +403,7 @@ def main(ai_name, verbose):
     features = model.attributes["features"]
     y_label = model.attributes["y_label"]
     print("Input features:", features)
+    print(f"y_label: {y_label}")
 
     # Provide basic apartment information
     apartments = {}

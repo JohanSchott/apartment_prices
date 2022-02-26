@@ -16,18 +16,9 @@ def distance_2_sthlm_center(latitude, longitude):
     # Stockholm city center coordinates.
     latitude_c = 59.33077
     longitude_c = 18.059101
-    # Create distance to center function
-    distance2center_function = get_distance2center_function(latitude_c, longitude_c)
     # Calculate distance to the center
-    distance = distance2center_function(latitude, longitude)
+    distance = get_great_circle_distance(latitude, longitude, latitude_c, longitude_c)
     return distance
-
-
-def get_distance2center_function(latitude_c, longitude_c):
-    distance2center_function = lambda latitude, longitude: get_great_circle_distance(
-        latitude, longitude, latitude_c, longitude_c
-    )
-    return distance2center_function
 
 
 def get_great_circle_distance(latitude, longitude, latitude_c, longitude_c):

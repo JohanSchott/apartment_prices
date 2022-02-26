@@ -53,7 +53,6 @@ def main():
 
     # Define the codec and create VideoWriter object
     codec = "mp4v"
-    codev = "gif"
     fourcc = cv2.VideoWriter_fourcc(*codec)  # Be sure to use lower case
     out = cv2.VideoWriter(output, fourcc, 20.0, (width, height))
 

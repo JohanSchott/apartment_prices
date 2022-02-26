@@ -8,9 +8,7 @@ from datetime import datetime
 
 # cartopy related libraries
 import cartopy.crs as ccrs
-from cartopy.io import shapereader
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
-import matplotlib.ticker as mticker
 import cartopy.io.img_tiles as cimgt
 
 # Local libraries
@@ -152,16 +150,14 @@ def plot_apartments_in_color(x, features, color, colorbarlabel):
         transform=ccrs.PlateCarree(),
     )
     cbar = plt.colorbar(sc)
-    if colorbarlabel != None:
+    if colorbarlabel is not None:
         cbar.ax.set_ylabel(colorbarlabel)
 
 
 def plot_apartments(x, features):
     i = np.where(features == "latitude")[0][0]
     j = np.where(features == "longitude")[0][0]
-    sc = plt.scatter(
-        x[j, :], x[i, :], s=0.01, c="m", label="data", transform=ccrs.PlateCarree()  # cmap=plt.cm.seismic,
-    )
+    plt.scatter(x[j, :], x[i, :], s=0.01, c="m", label="data", transform=ccrs.PlateCarree())  # cmap=plt.cm.seismic,
 
 
 def plot_contours(figure_handle, x, y, z, levels=50, colorbarlabel=None):
@@ -169,7 +165,7 @@ def plot_contours(figure_handle, x, y, z, levels=50, colorbarlabel=None):
     CS2 = plt.contour(CS, levels=CS.levels[::1], cmap=plt.cm.jet, alpha=0.8, transform=ccrs.PlateCarree())
     # Make a colorbar for the ContourSet returned by the contourf call.
     cbar = figure_handle.colorbar(CS)
-    if colorbarlabel != None:
+    if colorbarlabel is not None:
         cbar.ax.set_ylabel(colorbarlabel)
     # Add the contour line levels to the colorbar
     cbar.add_lines(CS2)

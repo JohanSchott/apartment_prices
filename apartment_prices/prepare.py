@@ -10,11 +10,8 @@ This module contains functions for pre-processing example data.
 """
 
 import numpy as np
-from numpy import pi
-import time
 import pandas as pd
 import h5py
-import os
 
 # Local stuff
 from apartment_prices import time_stuff

@@ -10,7 +10,7 @@ def apartment_into(features, apartment, model=None):
             print(feature + ": {:.2f}".format(value) + " (corresponds to date: " + str(dt_object.date()) + ")")
         else:
             print(feature + ": {:.2f}".format(value))
-    if model != None:
+    if model is not None:
 
         area_index = np.where(features == "livingArea")[0][0]
         area = apartment[area_index]

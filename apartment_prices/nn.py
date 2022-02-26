@@ -1,15 +1,9 @@
-#!/usr/bin/env python3
-
 """
-
-nn
-==
-
 This module contains a neural network class and some useful neural network functions.
-
 """
 
 
+from functools import partial
 import numpy as np
 import h5py
 from scipy.optimize import minimize
@@ -67,7 +61,7 @@ class Model:
         y_train,
         x_cv,
         y_cv,
-        gammas=[0.00001],
+        gammas=(0.00001,),
         epochs=1,
         batchsize=30000,
         method="BFGS",
@@ -131,16 +125,16 @@ class Model:
         mu_y, std_y = get_norm_and_scale(y_train)
 
         # Set default values
-        if not "p" in self.data:
+        if "p" not in self.data:
             # Randomly initialize parameters
             self.data["p"] = np.random.randn(r).astype(dtype)
-        if not "mu_x" in self.data or renormalize:
+        if "mu_x" not in self.data or renormalize:
             self.data["mu_x"] = mu_x
-        if not "std_x" in self.data or renormalize:
+        if "std_x" not in self.data or renormalize:
             self.data["std_x"] = std_x
-        if not "mu_y" in self.data or renormalize:
+        if "mu_y" not in self.data or renormalize:
             self.data["mu_y"] = mu_y
-        if not "std_y" in self.data or renormalize:
+        if "std_y" not in self.data or renormalize:
             self.data["std_y"] = std_y
         # Normalized and scaled data
         x_train = (x_train - self.data["mu_x"]) / self.data["std_x"]
@@ -314,9 +308,9 @@ def hypothesis(x, p, layers, activation_type="sigmoid", logistic_output=False):
 
     """
     if activation_type == "sigmoid":
-        g = lambda v: sigmoid(v)
+        g = sigmoid
     elif activation_type == "ReLu":
-        g = lambda v: relu(v)
+        g = relu
     else:
         raise Exception("This activation function has not been implemented.")
 
@@ -433,17 +427,12 @@ def get_norm_and_scale(x, axis=1):
         # Average and standard deviation
         mu = np.mean(x)
         std = np.std(x)
-        # Normalize and scale input
-        x_ns = (x - mu) / std
     elif x.ndim == 2:
         # Average and standard deviation
         mu = np.mean(x, axis=axis, keepdims=True)
         std = np.std(x, axis=axis, keepdims=True)
-        # Normalize and scale input
-        x_ns = (x - mu) / std
     else:
         raise Exception("Not implemented yet...")
-    # return x_ns, mu, std
     return mu, std
 
 
@@ -522,6 +511,7 @@ def gradient_descent(fun, jac, p_initial, alpha=0.05, maxiter=10**4, rel_df_tol=
     """
     p = p_initial.copy()
     info = {}
+    f_old_value = np.nan
     for i in range(maxiter):
         # Calculate function and its gradient
         f_new_value, f_new_gradient = fun(p), jac(p)
@@ -556,9 +546,9 @@ def train_linear_regression(x_train, y_train, x_cv, y_cv, gammas, alpha=0.05, ma
     # Loop over regularization values
     for i, gamma in enumerate(gammas):
         # Cost function, for linear regression
-        fun = lambda p: cost_linear_regression(p, x_train, y_train, gamma, output="value")
+        fun = partial(cost_linear_regression, x=x_train, y=y_train, gamma=gamma, output="value")
         # Gradient of the cost function, for linear regression
-        jac = lambda p: cost_linear_regression(p, x_train, y_train, gamma, output="gradient")
+        jac = partial(cost_linear_regression, x=x_train, y=y_train, gamma=gamma, output="gradient")
         # Train model by minimizing the cost function for the training data.
         # This gives the optimal parameters.
         _, p, _ = gradient_descent(fun, jac, p_initial, alpha, maxiter, rel_df_tol)
@@ -621,9 +611,6 @@ def train_NN(
         Maximum number of minimization iterations for each batch.
 
     """
-    # Number of features
-    n = np.shape(x_train)[0]
-
     # Number of parameters
     r = get_number_of_NN_parameters(layers)
 
@@ -684,7 +671,7 @@ def get_minimization_solution(
     # Number of examples
     m = len(y)
     assert x.shape[1] == m
-    if batchsize == None:
+    if batchsize is None:
         batchsize = m
     assert batchsize <= m
     # Number of batches
@@ -705,16 +692,23 @@ def get_minimization_solution(
             else:
                 indices = permutation[batch * batchsize : (batch + 1) * batchsize]
             # NN cost function and its gradient.
-            fun = lambda param: cost_NN(
-                param, x[:, indices], y[indices], layers, activation_type, logistic_output, gamma=gamma, output="value"
+            fun = partial(
+                cost_NN,
+                x=x[:, indices],
+                y=y[indices],
+                layers=layers,
+                activation_type=activation_type,
+                logistic_output=logistic_output,
+                gamma=gamma,
+                output="value",
             )
-            jac = lambda param: cost_NN(
-                param,
-                x[:, indices],
-                y[indices],
-                layers,
-                activation_type,
-                logistic_output,
+            jac = partial(
+                cost_NN,
+                x=x[:, indices],
+                y=y[indices],
+                layers=layers,
+                activation_type=activation_type,
+                logistic_output=logistic_output,
                 gamma=gamma,
                 output="gradient",
             )
@@ -824,7 +818,15 @@ def cost_NN_numerical_gradient(
     delta : float
         Step size in the estimation of the gradient.
     """
-    f = lambda v: cost_NN_only_value(v, x, y, layers, activation_type, logistic_output, gamma)
+    f = partial(
+        cost_NN_only_value,
+        x=x,
+        y=y,
+        layers=layers,
+        activation_type=activation_type,
+        logistic_output=logistic_output,
+        gamma=gamma,
+    )
     c = f(p)
     dp = gradient_numerical(f, p, delta)
     return c, dp
@@ -846,6 +848,18 @@ def gradient_numerical(f, p, delta):
         # restore the value at index i in p_tmp
         p_tmp[i] = p[i]
     return dp
+
+
+def get_g_and_dg(activation_type: str):
+    if activation_type == "sigmoid":
+        g = sigmoid
+        dg = dsigmoid
+    elif activation_type == "ReLu":
+        g = relu
+        dg = drelu
+    else:
+        raise Exception("This activation function has not been implemented.")
+    return g, dg
 
 
 def cost_NN(p, x, y, layers, activation_type="sigmoid", logistic_output=False, gamma=0.0, output="value and gradient"):
@@ -872,15 +886,7 @@ def cost_NN(p, x, y, layers, activation_type="sigmoid", logistic_output=False, g
         'value and gradient', 'value' or 'gradient'
 
     """
-    if activation_type == "sigmoid":
-        g = lambda v: sigmoid(v)
-        dg = lambda v: dsigmoid(v)
-    elif activation_type == "ReLu":
-        g = lambda v: relu(v)
-        dg = lambda v: drelu(v)
-    else:
-        raise Exception("This activation function has not been implemented.")
-
+    g, dg = get_g_and_dg(activation_type)
     # Number of features and number of data examples
     n, m = np.shape(x)
     # Model parameters, unrolled

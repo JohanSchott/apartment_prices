@@ -1,14 +1,15 @@
-#!/usr/bin/env python
+"""
+# Predict house prices
+Provide some basic information about an apartment, and get an estimate of the value of the apartment,
+at any desired time!
 
-# # Predict house prices
-# Provide some basic information about an apartment, and get an estimate of the value of the apartment, at any desired time!
-#
-# ## Workflow
-# ### 1) Load machine learning (ML) model
-# ### 2) Provide basic apartment information
-# ### 3) Estimate prices in Stockholm!
-# #### 3.1) Analyze specific addresses
-# #### 3.2) Create contour color-map of Stockholm
+## Workflow
+### 1) Load machine learning (ML) model
+### 2) Provide basic apartment information
+### 3) Estimate prices in Stockholm!
+#### 3.1) Analyze specific addresses
+#### 3.2) Create contour color-map of Stockholm
+"""
 
 
 import matplotlib.pylab as plt
