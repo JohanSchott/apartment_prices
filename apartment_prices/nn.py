@@ -145,6 +145,7 @@ class Model:
         y_cv = (y_cv - self.data["mu_y"]) / self.data["std_y"]
 
         history = []
+        cost_cv_best = np.inf
         for i, gamma in enumerate(gammas):
             print("Regularization parameter value:", gamma)
             p, hist = get_minimization_solution(
@@ -163,11 +164,7 @@ class Model:
             cost_cv = cost_NN(p, x_cv, y_cv, self.data["layers"], self.data["activation_type"], output="value")
             hist["cost cv without regularization"] = cost_cv
             history.append(hist)
-            if i == 0:
-                i_best = 0
-                cost_cv_best = cost_cv
-                p_best = p
-            elif cost_cv < cost_cv_best:
+            if cost_cv <= cost_cv_best:
                 i_best = i
                 cost_cv_best = cost_cv
                 p_best = p
@@ -933,11 +930,12 @@ def cost_NN(p, x, y, layers, activation_type="sigmoid", logistic_output=False, g
     dw: list[ndarray] = []
     db: list[ndarray] = []
     # Parallelized version, no loop over examples
+    # Initialize dz from the last layer.
+    j = len(layers) - 2
+    dz = a[j] - y
     for j in range(len(layers) - 1)[-1::-1]:
         # Last layer is treated specially
-        if j == len(layers) - 2:
-            dz = a[j] - y
-        else:
+        if j != len(layers) - 2:
             # Element-wise multiplication between "da" and da/dz
             dz = np.dot(w[j + 1].T, dz) * dg(z[j])
         # First to second layer is treated specially
