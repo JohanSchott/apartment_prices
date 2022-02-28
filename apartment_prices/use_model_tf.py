@@ -5,9 +5,9 @@ Provide some basic information about an apartment, and get an estimate of the va
 at any desired time!
 
 ## Workflow
-### *) Load machine learning (ML) model
-### *) Provide basic apartment information
-### *) Estimate prices in Stockholm!
+- Load machine learning (ML) model
+- Provide basic apartment information
+- Estimate prices in Stockholm!
 
 """
 
