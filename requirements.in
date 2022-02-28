@@ -11,8 +11,6 @@ pandas==1.1.4
 geopy==2.0.0
 opencv-python==4.4.0.46
 imageio==2.9.0
-sphinx==3.3.1
-sphinx-rtd-theme==0.5.0
 black==22.1.0
 flake8==4.0.1
 flake8-bugbear==22.1.11
@@ -21,3 +19,6 @@ pylint==2.12.2
 mypy==0.931
 pytype==2022.2.17
 Cartopy==0.20.2
+sphinx==4.4.0
+sphinx-rtd-theme==0.5.2
+sphinx-autodoc-typehints==1.16.0
