@@ -29,6 +29,7 @@ rm -f requirements.txt
 if [ "$(uname)" == "Darwin" ]; then
     pip-compile -q requirements-OSX.in --output-file requirements.txt
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    pip install --disable-pip-version-check -q $(cat requirements.in | grep numpy)
     pip-compile -q requirements.in
 fi
 pip install --disable-pip-version-check -q -r requirements.txt
