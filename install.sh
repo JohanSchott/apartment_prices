@@ -26,5 +26,9 @@ test -d ~/envMap || python3.9 -m venv ~/envMap
 pip install --disable-pip-version-check -q -U pip==22.0.3
 pip install --disable-pip-version-check -q pip-tools==6.5.1
 rm -f requirements.txt
-pip-compile -q requirements.in
+if [ "$(uname)" == "Darwin" ]; then
+    pip-compile -q requirements-OSX.in --output-file requirements.txt
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    pip-compile -q requirements.in
+fi
 pip install --disable-pip-version-check -q -r requirements.txt
