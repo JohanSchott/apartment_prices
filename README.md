@@ -68,6 +68,11 @@ Check unit-tests with
 pytest
 ```
 
+Check style and types with
+```bash
+make check
+```
+
 ### Documentation
 The documentation of this package is found in the directory `docs`.
 
