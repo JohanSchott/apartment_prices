@@ -1,16 +1,16 @@
 
-# Generated documentation files
-docs/_build/*
-
 # Compiled Modules
 *.pyc
-#*.so
 
 .DS_Store
-
-# Generated from requirements.in
-requirements.txt
 
 figures/*_new.pdf
 figures/*_new.png
 figures/video/*
+
+# pip-compile output
+requirements.txt
+
+# Generated documentation files
+doc/sphinx/generated_doc/*
+doc/sphinx/_doc_build/*

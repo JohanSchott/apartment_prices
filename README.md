@@ -74,12 +74,12 @@ make check
 ```
 
 ### Documentation
-The documentation of this package is found in the directory `docs`.
+The documentation of this package is found in the directory `doc`.
 
 To update the manual, type:
 
 ```bash
-cd docs && sphinx-apidoc -f --implicit-namespaces -o . ../apartment_prices && make html
+make -s -C doc/sphinx clean
+make -s -C doc/sphinx html
 ```
 to generate a html-page.
-
