@@ -1,10 +1,5 @@
 """
-
-preparation
-===========
-
 This module contains functions for pre-processing example data.
-
 """
 
 import numpy as np
