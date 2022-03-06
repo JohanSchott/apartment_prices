@@ -1,9 +1,5 @@
 """
-test_location
-=============
-
 Module with tests of functions related to location.
-
 """
 
 
