@@ -1,10 +1,5 @@
 """
-
-nn
-==
-
 This module contains a neural network class.
-
 """
 
 
@@ -12,10 +7,10 @@ import numpy as np
 import h5py
 
 # Tensorflow libraries
+import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras import regularizers
-from keras import optimizers
 from keras.models import load_model
 
 # Local libraries
@@ -83,8 +78,7 @@ class Model_tf:
             else:
                 model.add(Dense(layer, kernel_regularizer=regularizers.l2(model_design["gamma"])))
                 model.add(Activation(model_design["activation_type"]))
-            optimizer = optimizers.Adam()
-            # optimizer = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+            optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
             # For a mean squared error regression problem
             # self.model.compile(optimizer='rmsprop', loss='mse')
             model.compile(optimizer=optimizer, loss="mse")
