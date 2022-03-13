@@ -47,7 +47,7 @@ def main():
         "rooms": 3,
         "rent": 3370,
         "floor": 4,
-        "constructionYear": 1996,
+        "constructionYear": 1993,
         "latitude": position.latitude,
         "longitude": position.longitude,
         "distance2SthlmCenter": location.distance_2_sthlm_center(position.latitude, position.longitude),
