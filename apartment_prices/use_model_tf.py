@@ -66,7 +66,7 @@ def get_price_history(model, apartments):
     """
     features = model.attributes["features"]
     time_index = np.where(features == "soldDate")[0][0]
-    years = range(2013, 2022)
+    years = range(2013, datetime.now().year + 1 + 1)
     months = range(1, 13)
     times = np.zeros(len(years) * len(months))
     prices = np.zeros((len(years) * len(months), len(apartments)))
