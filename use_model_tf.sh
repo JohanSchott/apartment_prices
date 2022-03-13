@@ -9,4 +9,7 @@
 #python -m apartment_prices.use_model_tf stor_stockholm1
 
 # Model 2
-python -m apartment_prices.use_model_tf stor_stockholm2
+#python -m apartment_prices.use_model_tf stor_stockholm2
+
+# Model 3
+python -m apartment_prices.use_model_tf stor_stockholm3
