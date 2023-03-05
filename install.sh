@@ -23,8 +23,8 @@ fi
 test -d ~/envMap || python3.9 -m venv ~/envMap
 . ~/envMap/bin/activate
 
-pip install --disable-pip-version-check -q -U pip==22.0.3
-pip install --disable-pip-version-check -q pip-tools==6.5.1
+pip install --disable-pip-version-check -q -U pip==23.0.1
+pip install --disable-pip-version-check -q pip-tools==6.8.0
 rm -f requirements.txt
 if [ "$(uname)" == "Darwin" ]; then
     # Follow instructions from https://scitools.org.uk/cartopy/docs/latest/installing.html
