@@ -1,8 +1,9 @@
 from math import pi
 from typing import Union
+
 import numpy as np
-from numpy import ndarray
 from geopy.geocoders import Nominatim
+from numpy import ndarray
 
 
 def get_location_info(street, city="Stockholm", county="Stockholms län", country="Sweden"):
@@ -106,10 +107,7 @@ def get_spherical_coordinates(latitude, longitude):
     theta = pi / 2 - latitude * pi / 180
     phi = np.zeros_like(longitude, dtype=float)
     if phi.ndim == 0:
-        if longitude >= 0:
-            phi = longitude * pi / 180
-        else:
-            phi = 2 * pi + longitude * pi / 180
+        phi = longitude * pi / 180 if longitude >= 0 else 2 * pi + longitude * pi / 180
     else:
         mask = longitude >= 0
         phi[mask] = longitude[mask] * pi / 180

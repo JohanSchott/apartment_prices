@@ -1,5 +1,6 @@
 import argparse
 import os
+
 import cv2
 import imageio
 
@@ -57,7 +58,6 @@ def main():
     out = cv2.VideoWriter(output, fourcc, 20.0, (width, height))
 
     for image in images:
-
         image_path = os.path.join(dir_path, image)
         frame = cv2.imread(image_path)
 

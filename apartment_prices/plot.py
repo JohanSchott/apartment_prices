@@ -1,18 +1,16 @@
 """Module for plotting."""
 
 from datetime import datetime
-import matplotlib.pylab as plt
-import numpy as np
 
 # cartopy related libraries
 import cartopy.crs as ccrs
-from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import cartopy.io.img_tiles as cimgt
+import matplotlib.pylab as plt
+import numpy as np
+from cartopy.mpl.gridliner import LATITUDE_FORMATTER, LONGITUDE_FORMATTER
 
 # Local libraries
-from apartment_prices import location
-from apartment_prices import time_stuff
-from apartment_prices import nn
+from apartment_prices import location, nn, time_stuff
 
 
 def visualize_data(x_raw, y_raw, features, y_label, normal_apartment_indices):

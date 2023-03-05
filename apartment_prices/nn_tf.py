@@ -3,15 +3,14 @@ This module contains a neural network class.
 """
 
 
-import numpy as np
 import h5py
+import numpy as np
 
 # Tensorflow libraries
 import tensorflow as tf
-from keras.models import Sequential
-from keras.layers import Dense, Activation
 from keras import regularizers
-from keras.models import load_model
+from keras.layers import Activation, Dense
+from keras.models import Sequential, load_model
 
 # Local libraries
 from apartment_prices import nn
@@ -200,15 +199,9 @@ class Model_tf:
             x_train, y_train, validation_data=(x_cv, y_cv), batch_size=batch_size, epochs=epochs, verbose=verbose
         )
         # Training and cross-validation cost values
-        if x_train.ndim == 2:
-            batch_size = min(10000, x_train.shape[0])
-        else:
-            batch_size = None
+        batch_size = min(10000, x_train.shape[0]) if x_train.ndim == 2 else None
         self.data["cost_train"] = self.model.evaluate(x_train, y_train, batch_size=batch_size)
-        if x_cv.ndim == 2:
-            batch_size = min(10000, x_cv.shape[0])
-        else:
-            batch_size = None
+        batch_size = min(10000, x_cv.shape[0]) if x_cv.ndim == 2 else None
         self.data["cost_cv"] = self.model.evaluate(x_cv, y_cv, batch_size=batch_size)
         return history
 

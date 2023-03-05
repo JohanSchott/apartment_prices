@@ -13,15 +13,13 @@ at any desired time!
 
 
 from datetime import datetime
+
 import matplotlib.pylab as plt
 import numpy as np
 
 # Local libraries
-from apartment_prices import time_stuff
-from apartment_prices import location
+from apartment_prices import disp, location, plot, time_stuff
 from apartment_prices.nn import load_nn_model_from_file
-from apartment_prices import plot
-from apartment_prices import disp
 
 
 def main():

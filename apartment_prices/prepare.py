@@ -2,13 +2,12 @@
 This module contains functions for pre-processing example data.
 """
 
+import h5py
 import numpy as np
 import pandas as pd
-import h5py
 
 # Local stuff
-from apartment_prices import time_stuff
-from apartment_prices import location
+from apartment_prices import location, time_stuff
 
 
 def read_csv_and_save_processed_data_to_hdf5(csv_file):
