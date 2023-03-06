@@ -12,7 +12,7 @@ geopy==2.0.0
 opencv-python==4.4.0.46
 imageio==2.9.0
 black==23.1.0
-mypy==0.931
+mypy==1.0.1
 pytype==2023.3.2
 Cartopy==0.21.1
 sphinx==4.4.0
