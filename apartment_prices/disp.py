@@ -1,5 +1,6 @@
 import time
 from datetime import datetime
+
 import numpy as np
 
 
@@ -11,7 +12,6 @@ def apartment_into(features, apartment, model=None):
         else:
             print(feature + ": {:.2f}".format(value))
     if model is not None:
-
         area_index = np.where(features == "livingArea")[0][0]
         area = apartment[area_index]
         t0 = time.time()

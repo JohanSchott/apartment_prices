@@ -5,12 +5,12 @@ This module contains a neural network class and some useful neural network funct
 
 from functools import partial
 from typing import Any
-import numpy as np
-from numpy import ndarray
-import h5py
-from scipy.optimize import minimize
-import scipy.special
 
+import h5py
+import numpy as np
+import scipy.special
+from numpy import ndarray
+from scipy.optimize import minimize
 
 # Machine precision to use
 dtype = np.float32
@@ -283,17 +283,9 @@ def norm_and_scale(x, mu, std, axis=1):
     """
     Return normalized data.
     """
-    if x.ndim == 1:
+    if x.ndim in (1, 2):
         # Normalize and scale input
         x_ns = (x - mu) / std
-    elif x.ndim == 2:
-        # Normalize and scale input
-        x_ns = (x - mu) / std
-        # Number of features
-        # n = np.shape(x)[0]
-        # x_ns = np.zeros_like(x)
-        # for i in range(n):
-        #    x_ns[i,:] = (x[i,:] - mu[i])/std[i]
     else:
         raise Exception("Not implemented yet...")
     return x_ns
@@ -326,10 +318,7 @@ def hypothesis(x, p, layers, activation_type="sigmoid", logistic_output=False):
         z = np.dot(wm, z) + bv
         # Last layer is treated specially
         if j == len(layers) - 2:
-            if logistic_output:
-                h = g(z)
-            else:
-                h = z
+            h = g(z) if logistic_output else z
         else:
             z = g(z)
     return h

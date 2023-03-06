@@ -23,8 +23,8 @@ fi
 test -d ~/envMap || python3.9 -m venv ~/envMap
 . ~/envMap/bin/activate
 
-pip install --disable-pip-version-check -q -U pip==22.0.3
-pip install --disable-pip-version-check -q pip-tools==6.5.1
+pip install --disable-pip-version-check -q -U pip==23.0.1
+pip install --disable-pip-version-check -q pip-tools==6.8.0
 rm -f requirements.txt
 if [ "$(uname)" == "Darwin" ]; then
     # Follow instructions from https://scitools.org.uk/cartopy/docs/latest/installing.html
@@ -40,10 +40,8 @@ if [ "$(uname)" == "Darwin" ]; then
     # https://stackoverflow.com/questions/56466395/libproj-not-loaded-while-installing-sumo-on-macos#
     # This is the command I ran to create the symbolic link to make Cartopy work:
     # ln -s  /usr/local/opt/proj/lib/libproj.dylib /usr/local/opt/proj/lib/libproj.22.dylib
-
-    pip-compile -q requirements-OSX.in --output-file requirements.txt
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     pip install --disable-pip-version-check -q $(cat requirements.in | grep numpy)
-    pip-compile -q requirements.in
 fi
+pip-compile -q requirements.in
 pip install --disable-pip-version-check -q -r requirements.txt
