@@ -2,7 +2,6 @@
 Module with tests of functions related to location.
 """
 
-
 import math
 
 # Local

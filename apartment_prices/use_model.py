@@ -11,7 +11,6 @@ at any desired time!
 #### 3.2) Create contour color-map of Stockholm
 """
 
-
 from datetime import datetime
 
 import matplotlib.pylab as plt

@@ -8,8 +8,6 @@ figures/*_new.pdf
 figures/*_new.png
 figures/video/*
 
-# pip-compile output
-requirements.txt
 
 # Generated documentation files
 doc/sphinx/generated_doc/*

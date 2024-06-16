@@ -11,14 +11,13 @@ at any desired time!
 
 """
 
-
 import argparse
+import os
 import time
 from datetime import datetime
 
 import matplotlib.pyplot as plt
 import numpy as np
-import tensorflow
 
 # Local libraries
 from apartment_prices import disp, location, plot, time_stuff, video
@@ -30,7 +29,7 @@ def get_price_on_grid(model, apartment, latitudes, longitudes, features):
     Return apartment prices on a grid, as well as latitudes and longitudes
     """
     longitude_grid, latitude_grid = np.meshgrid(longitudes, latitudes)
-    t0 = time.time()
+    t_measure = time.time()
     apartments_on_grid = np.zeros((len(features), len(latitudes) * len(longitudes)), dtype=np.float32)
     k_lat = np.where(features == "latitude")[0][0]
     k_long = np.where(features == "longitude")[0][0]
@@ -45,8 +44,10 @@ def get_price_on_grid(model, apartment, latitudes, longitudes, features):
                 latitude, longitude
             )
             apartment_index += 1
+    print(f"Calculating features for all grid points took {time.time() - t_measure :.1f} seconds")
+    t_measure = time.time()
     price_grid = model.predict(apartments_on_grid).reshape(len(latitudes), len(longitudes))
-    print("Predicting prices on the grid took {:.1f} seconds".format(time.time() - t0))
+    print(f"Predicting prices on the grid took {time.time() - t_measure :.1f} seconds")
     return price_grid, longitude_grid, latitude_grid
 
 
@@ -285,9 +286,9 @@ def videos_on_map(model, apartment, latitudes, longitudes, x=None):
         If not None, represents K features for L different apartments.
 
     """
-    years = range(2013, 2021)
+    years = range(2013, datetime.now().year)
     months = range(1, 13)
-    days = (1, 15)
+    days = (1,)
 
     features = model.attributes["features"]
     time_index = np.where(features == "soldDate")[0][0]
@@ -308,6 +309,7 @@ def videos_on_map(model, apartment, latitudes, longitudes, x=None):
                 price_grid[price_grid < 0] = np.nan
                 prices.append(price_grid)
                 time_counter += 1
+                print(f"Prizes calculated for {time_counter} (out of {times.size}) dates.")
     prices = np.array(prices)
     # Plot the prices
     area_index = np.where(features == "livingArea")[0][0]
@@ -344,7 +346,11 @@ def make_video_on_map(
     longitude_lim = np.min(longitude_grid), np.max(longitude_grid)
     latitude_lim = np.min(latitude_grid), np.max(latitude_grid)
     filenames = []
+    dir_path = "figures/video"
+    if not os.path.isdir(dir_path):
+        os.mkdir(dir_path)
     for time_stamp, price_grid in zip(times, prices):
+        t_measure = time.time()
         fig = plt.figure(figsize=(8, 8))
         plot.plot_map(longitude_lim, latitude_lim, map_quality=12)
         if x is not None:
@@ -355,25 +361,22 @@ def make_video_on_map(
         plt.xlabel("longitude")
         plt.ylabel("latitude")
         t = datetime.fromtimestamp(time_stamp)
-        plt.title("year: {:4d}, month: {:2d}, day: {:2d}".format(t.year, t.month, t.day))
-        filename = (
-            "figures/video/"
-            + filename_keyword
-            + "_year"
-            + str(t.year)
-            + "_month"
-            + str(t.month)
-            + "_day"
-            + str(t.day)
-            + ".png"
-        )
+        plt.title(f"Date: {t.year :4d}/{t.month :2d}/{t.day :2d}")
+        filename = os.path.join(dir_path, f"{filename_keyword}_year{t.year}_month{t.month}_day{t.day}.png")
         plt.savefig(filename)
         plt.close()
         filenames.append(filename)
+        t_measure = time.time() - t_measure
+        print(f"Took {t_measure :.1f} seconds to create figure: {filename}")
     # Make video from figures
-    fps = 32.0
-    video.pngs_to_movie(filenames, movie_filename="figures/video/" + filename_keyword + ".mp4", codec="mp4v", fps=fps)
-    # video.pngs_to_gif(filenames, movie_filename='figures/video/' + filename_keyword + '.gif', fps=fps)
+    t_measure = time.time()
+    fps = 20.0
+    video.pngs_to_movie(
+        filenames, movie_filename=os.path.join(dir_path, f"{filename_keyword}.mp4"), codec="mp4v", fps=fps
+    )
+    # video.pngs_to_gif(filenames, movie_filename=os.path.join(dir_path, f"{filename_keyword}.gif"), fps=fps)
+    t_measure = time.time() - t_measure
+    print(f"Took {t_measure :.1f} seconds to make video from pictures")
 
 
 def plot_distance_to_ceneter_on_map(latitudes, longitudes):
@@ -395,7 +398,7 @@ def plot_distance_to_ceneter_on_map(latitudes, longitudes):
     plt.show()
 
 
-def main(ai_name, verbose):
+def main(ai_name: str):
     model = Model_tf(ai_name)
     features = model.attributes["features"]
     y_label = model.attributes["y_label"]
@@ -474,12 +477,7 @@ def main(ai_name, verbose):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Use Neural Network")
-    parser.add_argument("ai_name", help="Name of AI model name.")
-    parser.add_argument("--verbose", type=int, default=1, choices=[0, 1], help="Verbose flag.")
+    parser.add_argument("ai_name", type=str, help="Name of AI model name.")
     args = parser.parse_args()
 
-    # This is deprecated. But gives a 30 times speed-up, when predict price for one apartment.
-    # With more apartments the difference is much smaller.
-    tensorflow.compat.v1.disable_eager_execution()
-
-    main(args.ai_name, args.verbose)
+    main(args.ai_name)

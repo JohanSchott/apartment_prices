@@ -1,5 +1,4 @@
 from math import pi
-from typing import Union
 
 import numpy as np
 from geopy.geocoders import Nominatim
@@ -77,7 +76,6 @@ def get_cartesian_distance(latitude, longitude, latitude_c, longitude_c):
     pos = get_cartesian_coordinates(latitude, longitude)
     pos_c = get_cartesian_coordinates(latitude_c, longitude_c)
     # Calculate the distance to the center point
-    distance: Union[float, ndarray]
     if isinstance(latitude, float) and isinstance(longitude, float):
         distance = 0.0
         for i in range(3):
@@ -89,7 +87,7 @@ def get_cartesian_distance(latitude, longitude, latitude_c, longitude_c):
             distance += (pos[i, :] - float(pos_c[i])) ** 2
         distance = np.sqrt(distance)
     else:
-        raise TypeError()
+        raise TypeError(f"{latitude}, {longitude}")
     return distance
 
 
