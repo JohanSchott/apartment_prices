@@ -1,13 +1,11 @@
 """Module for plotting."""
 
 from datetime import datetime
-
-# cartopy related libraries
-import cartopy.crs as ccrs
-import cartopy.io.img_tiles as cimgt
 import matplotlib.pylab as plt
 import numpy as np
+import cartopy.crs as ccrs
 from cartopy.mpl.gridliner import LATITUDE_FORMATTER, LONGITUDE_FORMATTER
+from cartopy.io.img_tiles import GoogleTiles, OSM, QuadtreeTiles
 
 # Local libraries
 from apartment_prices import location, nn, time_stuff
@@ -182,21 +180,15 @@ def plot_map(longitude_lim, latitude_lim, map_quality=11):
         6 is very bad, 10 is ok, 12 is good, 13 is very good, 14 excellent.
 
     """
-    # Map extent
-    eps = 0 * 0.01
-    extent = [longitude_lim[0] - eps, longitude_lim[1] + eps, latitude_lim[0] - eps, latitude_lim[1] + eps]
+
     # Plot map of Stockholm
-    map_design = "StamenTerrain"
-    if map_design == "GoogleTiles":
-        request = cimgt.GoogleTiles()
-    elif map_design == "QuadtreeTiles":
-        request = cimgt.QuadtreeTiles()
-    elif map_design == "StamenTerrain":
-        request = cimgt.Stamen("terrain-background")
-    else:
-        # Map designs 'OSM' and 'MapboxTiles' do not work
-        raise Exception("Untested map design")
-    ax = plt.axes(projection=request.crs)
+    map_design = "GoogleTiles"
+    tilers = {"GoogleTiles": GoogleTiles(style="street"),  # style="satellite" also looks good
+              "OSM":OSM(),
+              "QuadtreeTiles":QuadtreeTiles(),}
+    tiler = tilers[map_design]
+
+    ax = plt.axes(projection=tiler.crs)
     gl = ax.gridlines(draw_labels=True, alpha=0.0, linewidth=0, linestyle="-")
     gl.top_labels = False
     gl.right_labels = False
@@ -204,8 +196,12 @@ def plot_map(longitude_lim, latitude_lim, map_quality=11):
     gl.yformatter = LATITUDE_FORMATTER
     gl.xlabel_style = {"size": 10, "color": "black"}
     gl.ylabel_style = {"size": 10, "color": "black", "weight": "normal"}
-    ax.set_extent(extent)
-    ax.add_image(request, map_quality)
+
+    # Map extent
+    eps = 0 * 0.01
+    extent = [longitude_lim[0] - eps, longitude_lim[1] + eps, latitude_lim[0] - eps, latitude_lim[1] + eps]
+    ax.set_extent(extent, crs=ccrs.PlateCarree())
+    ax.add_image(tiler, map_quality)
 
 
 def plot_sthlm_landmarks():

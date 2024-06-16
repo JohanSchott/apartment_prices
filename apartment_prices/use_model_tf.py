@@ -15,10 +15,10 @@ at any desired time!
 import argparse
 import time
 from datetime import datetime
-
+import os
 import matplotlib.pyplot as plt
 import numpy as np
-import tensorflow
+
 
 # Local libraries
 from apartment_prices import disp, location, plot, time_stuff, video
@@ -344,6 +344,9 @@ def make_video_on_map(
     longitude_lim = np.min(longitude_grid), np.max(longitude_grid)
     latitude_lim = np.min(latitude_grid), np.max(latitude_grid)
     filenames = []
+    dir_path = "figures/video"
+    if not os.path.isdir(dir_path):
+        os.mkdir(dir_path)
     for time_stamp, price_grid in zip(times, prices):
         fig = plt.figure(figsize=(8, 8))
         plot.plot_map(longitude_lim, latitude_lim, map_quality=12)
@@ -356,24 +359,14 @@ def make_video_on_map(
         plt.ylabel("latitude")
         t = datetime.fromtimestamp(time_stamp)
         plt.title("year: {:4d}, month: {:2d}, day: {:2d}".format(t.year, t.month, t.day))
-        filename = (
-            "figures/video/"
-            + filename_keyword
-            + "_year"
-            + str(t.year)
-            + "_month"
-            + str(t.month)
-            + "_day"
-            + str(t.day)
-            + ".png"
-        )
+        filename = os.path.join(dir_path, f"{filename_keyword}_year{t.year}_month{t.month}_day{t.day}.png")
         plt.savefig(filename)
         plt.close()
         filenames.append(filename)
     # Make video from figures
     fps = 32.0
-    video.pngs_to_movie(filenames, movie_filename="figures/video/" + filename_keyword + ".mp4", codec="mp4v", fps=fps)
-    # video.pngs_to_gif(filenames, movie_filename='figures/video/' + filename_keyword + '.gif', fps=fps)
+    video.pngs_to_movie(filenames, movie_filename=os.path.join(dir_path, f"{filename_keyword}.mp4"), codec="mp4v", fps=fps)
+    # video.pngs_to_gif(filenames, movie_filename=os.path.join(dir_path, f"{filename_keyword}.gif"), fps=fps)
 
 
 def plot_distance_to_ceneter_on_map(latitudes, longitudes):
@@ -395,7 +388,7 @@ def plot_distance_to_ceneter_on_map(latitudes, longitudes):
     plt.show()
 
 
-def main(ai_name, verbose):
+def main(ai_name: str):
     model = Model_tf(ai_name)
     features = model.attributes["features"]
     y_label = model.attributes["y_label"]
@@ -474,12 +467,7 @@ def main(ai_name, verbose):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Use Neural Network")
-    parser.add_argument("ai_name", help="Name of AI model name.")
-    parser.add_argument("--verbose", type=int, default=1, choices=[0, 1], help="Verbose flag.")
+    parser.add_argument("ai_name", type=str, help="Name of AI model name.")
     args = parser.parse_args()
 
-    # This is deprecated. But gives a 30 times speed-up, when predict price for one apartment.
-    # With more apartments the difference is much smaller.
-    tensorflow.compat.v1.disable_eager_execution()
-
-    main(args.ai_name, args.verbose)
+    main(args.ai_name)
