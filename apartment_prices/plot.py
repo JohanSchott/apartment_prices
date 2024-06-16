@@ -1,11 +1,12 @@
 """Module for plotting."""
 
 from datetime import datetime
+
+import cartopy.crs as ccrs
 import matplotlib.pylab as plt
 import numpy as np
-import cartopy.crs as ccrs
+from cartopy.io.img_tiles import OSM, GoogleTiles, QuadtreeTiles
 from cartopy.mpl.gridliner import LATITUDE_FORMATTER, LONGITUDE_FORMATTER
-from cartopy.io.img_tiles import GoogleTiles, OSM, QuadtreeTiles
 
 # Local libraries
 from apartment_prices import location, nn, time_stuff
@@ -183,9 +184,11 @@ def plot_map(longitude_lim, latitude_lim, map_quality=11):
 
     # Plot map of Stockholm
     map_design = "GoogleTiles"
-    tilers = {"GoogleTiles": GoogleTiles(style="street"),  # style="satellite" also looks good
-              "OSM":OSM(),
-              "QuadtreeTiles":QuadtreeTiles(),}
+    tilers = {
+        "GoogleTiles": GoogleTiles(style="street"),  # style="satellite" also looks good
+        "OSM": OSM(),
+        "QuadtreeTiles": QuadtreeTiles(),
+    }
     tiler = tilers[map_design]
 
     ax = plt.axes(projection=tiler.crs)

@@ -11,14 +11,13 @@ at any desired time!
 
 """
 
-
 import argparse
+import os
 import time
 from datetime import datetime
-import os
+
 import matplotlib.pyplot as plt
 import numpy as np
-
 
 # Local libraries
 from apartment_prices import disp, location, plot, time_stuff, video
@@ -365,7 +364,9 @@ def make_video_on_map(
         filenames.append(filename)
     # Make video from figures
     fps = 32.0
-    video.pngs_to_movie(filenames, movie_filename=os.path.join(dir_path, f"{filename_keyword}.mp4"), codec="mp4v", fps=fps)
+    video.pngs_to_movie(
+        filenames, movie_filename=os.path.join(dir_path, f"{filename_keyword}.mp4"), codec="mp4v", fps=fps
+    )
     # video.pngs_to_gif(filenames, movie_filename=os.path.join(dir_path, f"{filename_keyword}.gif"), fps=fps)
 
 

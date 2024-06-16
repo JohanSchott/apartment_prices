@@ -2,7 +2,6 @@
 This module contains a neural network class.
 """
 
-
 import h5py
 import numpy as np
 
@@ -21,7 +20,7 @@ class Model_tf:
     Basically a wrapper class around TensorFlow model.
     """
 
-    def __init__(self, ai_name: str, model_design:dict|None=None, attributes:dict|None=None):
+    def __init__(self, ai_name: str, model_design: dict | None = None, attributes: dict | None = None):
         """
         Create a new or load an existing AI model.
         """
