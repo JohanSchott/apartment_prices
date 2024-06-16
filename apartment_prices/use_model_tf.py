@@ -284,7 +284,7 @@ def videos_on_map(model, apartment, latitudes, longitudes, x=None):
         If not None, represents K features for L different apartments.
 
     """
-    years = range(2013, 2021)
+    years = range(2013, datetime.now().year)
     months = range(1, 13)
     days = (1, 15)
 
