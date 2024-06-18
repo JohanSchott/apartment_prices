@@ -235,10 +235,10 @@ def plot_price_on_map(model, apartment, latitudes, longitudes, x=None):
 
     """
     features = model.attributes["features"]
-    i = np.where(features == "soldDate")[0][0]
+    time_index = np.where(features == "soldDate")[0][0]
     apartment_reference = apartment.copy()
     # Change to current time
-    apartment_reference[i] = datetime.now().timestamp()
+    apartment_reference[time_index] = datetime.now().timestamp()
     price_grid, longitude_grid, latitude_grid = get_price_on_grid(
         model, apartment_reference, latitudes, longitudes, features
     )
@@ -249,18 +249,20 @@ def plot_price_on_map(model, apartment, latitudes, longitudes, x=None):
     if x is not None:
         plot.plot_apartments(x, features)
     # Plot the price
-    i = np.where(features == "livingArea")[0][0]
+    living_area_index = np.where(features == "livingArea")[0][0]
     plot.plot_contours(
         fig,
         longitude_grid,
         latitude_grid,
-        price_grid / (apartment_reference[i] * 10**3),
+        price_grid / (apartment_reference[living_area_index] * 10**3),
         colorbarlabel=r"price/$m^2$ (ksek)",
     )
     plot.plot_sthlm_landmarks()
     plt.legend(loc=1)
     plt.xlabel("longitude")
     plt.ylabel("latitude")
+    t = datetime.fromtimestamp(apartment_reference[time_index])
+    plt.title(f"Date: {t.year :4d}/{t.month :2d}/{t.day :2d}")
     plt.savefig("figures/sthlm_new.pdf")
     plt.savefig("figures/sthlm_new.png")
     plt.show()
@@ -286,7 +288,7 @@ def videos_on_map(model, apartment, latitudes, longitudes, x=None):
         If not None, represents K features for L different apartments.
 
     """
-    years = range(2013, datetime.now().year)
+    years = range(2013, datetime.now().year + 1)
     months = range(1, 13)
     days = (1,)
 
