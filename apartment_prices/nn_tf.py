@@ -126,7 +126,7 @@ class Model_tf:
                 group.create_dataset(key, data=value)
 
     def get_filenames(self):
-        filename_model_tf = "models/" + self.ai_name + "_tf.hdf5"
+        filename_model_tf = "models/" + self.ai_name + ".keras"
         filename_meta = "models/" + self.ai_name + "_meta.hdf5"
         return filename_model_tf, filename_meta
 

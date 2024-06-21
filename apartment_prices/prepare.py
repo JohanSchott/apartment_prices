@@ -11,6 +11,7 @@ from apartment_prices import location, time_stuff
 
 
 def read_csv_and_save_processed_data_to_hdf5(csv_file):
+    """Note, some apartments might be exluded before saved to hdf5-format."""
     hdf5_file = csv_file[:-3] + "hdf5"
     x, y, normal_apartment_indices, y_label, features = load_and_setup_data(csv_file)
     write_to_hdf5(hdf5_file, x, y, features, y_label)
@@ -197,7 +198,10 @@ def setup_data(apartments, labels, features, y_label):
     y_label_index = np.where(labels == y_label)[0][0]
     # Output vector
     y = np.array(apartments[normal_apartments, y_label_index], dtype=float)
-    print("{:d} apartments are un-normal and are excluded.".format(len(apartments) - len(normal_apartments)))
+    print(
+        f"Of {len(apartments)} apartments {len(normal_apartments)} are normal, "
+        f"so will exclude {len(apartments) - len(normal_apartments)} apartments."
+    )
 
     # Transpose for later convinience
     x = x.T
